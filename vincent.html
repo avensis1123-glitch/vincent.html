@@ -1,0 +1,1435 @@
+```html
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>佐渡島 厳選釣り場ダッシュボード - 拠点：ヴィンセント（佐和田・中原）</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=Noto+Sans+JP:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      overflow-x: hidden;
+      font-size: 16px;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #090d16;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+
+    /*
+     * 重要バグ修正:
+     * SVGの<g transform="translate(x,y)">に対してCSSのtransform: scale()を適用すると、
+     * モバイルブラウザ等で座標変換が上書きされ、ポップアップを閉じた際にピンや番号が消える現象が発生します。
+     * そのため、CSSのtransformは一切使用せず、専用の外周グローリングとストローク強調で選択状態を表現し、
+     * ピン番号(.pin-number)とピン円(.pin-circle)は常時 opacity:1 / visibility:visible を強制維持します。
+     */
+    .map-pin {
+      cursor: pointer;
+      outline: none;
+    }
+    .pin-circle {
+      opacity: 1 !important;
+      visibility: visible !important;
+      display: block !important;
+      transition: stroke-width 0.2s ease, filter 0.2s ease;
+    }
+    .pin-number {
+      fill: #ffffff !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      display: block !important;
+      pointer-events: none !important;
+      user-select: none !important;
+    }
+    .pin-glow-ring {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    .map-pin.pin-selected .pin-glow-ring {
+      opacity: 1 !important;
+    }
+    .map-pin.pin-selected .pin-circle {
+      stroke: #ffffff !important;
+      stroke-width: 4.5px !important;
+      filter: drop-shadow(0 0 14px rgba(56, 189, 248, 0.95));
+    }
+
+    /* 拠点パルスエフェクト */
+    @keyframes pulse-ring {
+      0% { r: 14; opacity: 0.95; }
+      100% { r: 44; opacity: 0; }
+    }
+    .pulse-ring-red {
+      animation: pulse-ring 2.2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+    }
+    @keyframes subtle-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.45; }
+    }
+    .pulse-dot {
+      animation: subtle-pulse 1.8s ease-in-out infinite;
+    }
+
+    /* 詳細カードのハイライト */
+    @keyframes target-glow {
+      0%, 100% { box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.5), 0 12px 28px -5px rgba(14, 165, 233, 0.3); }
+      50% { box-shadow: 0 0 0 4px rgba(56, 189, 248, 1), 0 12px 34px -3px rgba(14, 165, 233, 0.65); }
+    }
+    .card-highlight {
+      animation: target-glow 2s 2 ease-in-out;
+    }
+
+    /* 固定ヘッダーによるカードの見切れ防止マージン */
+    .spot-card {
+      scroll-margin-top: 155px;
+    }
+    @media (min-width: 640px) {
+      .spot-card {
+        scroll-margin-top: 120px;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-cyan-500 selection:text-slate-950 text-base sm:text-lg">
+
+  <!-- ヘッダー：文字サイズを拡大し、スマホでも見切れず折り返し表示 -->
+  <header class="border-b border-slate-800 bg-slate-900/95 backdrop-blur sticky top-0 z-40 shadow-lg">
+    <div class="max-w-[1440px] mx-auto px-4 py-3.5 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      
+      <!-- タイトルグループ -->
+      <div class="flex items-start gap-3 min-w-0 w-full sm:w-auto">
+        <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-rose-600 via-amber-500 to-sky-400 flex items-center justify-center text-slate-950 font-black shrink-0 shadow-lg shadow-rose-500/20 mt-0.5 sm:mt-0">
+          <svg class="w-6 h-6 sm:w-7 sm:h-7 fill-current text-white" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+          </svg>
+        </div>
+        <div class="min-w-0 flex-1">
+          <h1 class="text-xl sm:text-2xl font-black tracking-tight text-white whitespace-normal break-words leading-snug">
+            佐渡島 厳選釣り場ダッシュボード
+          </h1>
+          <p class="text-sm sm:text-base text-slate-300 whitespace-normal break-words mt-0.5 leading-snug font-medium">
+            拠点：ヴィンセント（佐和田・中原）｜カゴ釣り＆エギング特化
+          </p>
+        </div>
+      </div>
+
+      <!-- 操作ボタングループ：大きく押しやすいボタン -->
+      <div class="flex items-center gap-2.5 w-full sm:w-auto justify-end shrink-0 pt-2 sm:pt-0 border-t border-slate-800/80 sm:border-t-0">
+        <button id="btnExportSVG" class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 text-sm sm:text-base font-bold rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 transition active:scale-95 shadow-sm">
+          <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          <span>SVG地図保存</span>
+        </button>
+        <button id="btnSwitchView" class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 text-sm sm:text-base font-black rounded-xl bg-gradient-to-r from-cyan-500 to-sky-400 hover:from-cyan-400 hover:to-sky-300 text-slate-950 transition shadow-md shadow-cyan-500/20 active:scale-95">
+          <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          <span id="viewModeText">一覧表で比較</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- サマリーバー：大文字化＆横スクロール不要の折り返し配置 -->
+  <aside aria-label="拠点・気象情報" class="bg-slate-900/90 border-b border-slate-800 px-4 py-3 text-sm sm:text-base">
+    <div class="max-w-[1440px] mx-auto flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2.5">
+      
+      <!-- 拠点と風裏ハイライト -->
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-slate-200">
+        <span class="inline-flex items-center gap-2 text-rose-300 font-bold bg-rose-950/60 border border-rose-700/50 px-3 py-1 rounded-lg text-sm sm:text-base">
+          <span class="w-2.5 h-2.5 rounded-full bg-rose-500 pulse-dot"></span>
+          拠点: ヴィンセント（佐和田）
+        </span>
+        <span class="text-slate-300 leading-relaxed font-medium">
+          北西強風時の風裏: 
+          <strong class="text-sky-300 font-bold">①東海岸エリア（風島・両津・水津・赤泊/野崎鼻）</strong> / 
+          <strong class="text-sky-300 font-bold">⑥沢根・⑦真野湾</strong> / 
+          <strong class="text-amber-300 font-bold">⑩強清水</strong>（波・うねり要確認）
+        </span>
+      </div>
+
+      <!-- 分類凡例バッジ -->
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm sm:text-base text-slate-200 pt-1.5 lg:pt-0 border-t border-slate-800/70 lg:border-t-0 font-semibold">
+        <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-emerald-400 inline-block shadow-[0_0_8px_#34d399]"></span> 平磯・低磯</span>
+        <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-sky-400 inline-block shadow-[0_0_8px_#38bdf8]"></span> 安全堤防・東海岸風裏</span>
+        <span class="flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded-full bg-amber-400 inline-block shadow-[0_0_8px_#fbbf24]"></span> 本格外洋磯</span>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- メインコンテンツ -->
+  <main class="flex-1 max-w-[1440px] w-full mx-auto p-3.5 sm:p-5 lg:p-6 space-y-5 sm:space-y-6">
+
+    <!-- フィルター＆ソートコントロール：大きく見やすいチップボタン（横スクロールなし） -->
+    <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3.5 bg-slate-900/95 p-4 sm:p-5 rounded-2xl border border-slate-800 shadow-lg">
+      
+      <div class="flex flex-wrap items-center gap-2 sm:gap-2.5 text-sm sm:text-base font-bold" id="filterButtons">
+        <button data-filter="all" class="filter-btn active px-4 py-2.5 rounded-xl bg-cyan-500 text-slate-950 font-black transition shadow-sm active:scale-95">すべて表示 (10)</button>
+        <button data-filter="shelter" class="filter-btn px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/40 transition active:scale-95">風裏・穏やか候補 (4)</button>
+        <button data-filter="hiraiso" class="filter-btn px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/40 transition active:scale-95">平磯・低磯 (4)</button>
+        <button data-filter="pier" class="filter-btn px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 border border-sky-500/40 transition active:scale-95">安全堤防・東海岸 (4)</button>
+        <button data-filter="heavy" class="filter-btn px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/40 transition active:scale-95">本格外洋磯 (2)</button>
+      </div>
+
+      <div class="flex items-center justify-between lg:justify-end gap-3 text-sm sm:text-base pt-2.5 lg:pt-0 border-t border-slate-800 lg:border-t-0">
+        <label for="sortSelect" class="text-slate-300 font-bold shrink-0">並び順:</label>
+        <select id="sortSelect" class="flex-1 lg:flex-initial bg-slate-800 border border-slate-700 text-white font-semibold rounded-xl px-3.5 py-2.5 text-sm sm:text-base focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+          <option value="id">ポイント番号順 (①〜⑩)</option>
+          <option value="time-asc">所要時間（近い順）</option>
+          <option value="time-desc">所要時間（遠い順）</option>
+          <option value="safety">足場平坦・安全度順</option>
+        </select>
+      </div>
+
+    </div>
+
+    <!-- マップ ＋ スポットカード 2カラム分割表示エリア -->
+    <div id="interactiveContainer" class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+      
+      <!-- 左：大画面SVGマップ（7カラム分） -->
+      <div class="xl:col-span-7 bg-slate-900 border border-slate-800 rounded-2xl p-3.5 sm:p-5 shadow-2xl relative flex flex-col">
+        
+        <!-- マップヘッダー＆ズーム切替ボタン -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-3">
+          <div class="flex items-center gap-2.5">
+            <span class="w-3.5 h-3.5 rounded-full bg-cyan-400 shadow-[0_0_10px_#22d3ee]"></span>
+            <h2 class="font-black text-base sm:text-xl text-white tracking-wide">佐渡島 全域フィッシング大地図</h2>
+          </div>
+          
+          <!-- スマホでも地図を大きく拡大できるズームバー -->
+          <div class="flex items-center justify-between sm:justify-end gap-2 bg-slate-950/90 px-3 py-1.5 rounded-xl border border-slate-800">
+            <span class="text-xs sm:text-sm text-slate-300 font-bold">地図サイズ:</span>
+            <div class="flex items-center gap-1">
+              <button type="button" onclick="setMapZoom(1)" id="zoomBtn1" class="px-2.5 py-1 rounded-lg text-xs sm:text-sm font-black bg-cyan-500 text-slate-950 transition">標準</button>
+              <button type="button" onclick="setMapZoom(1.35)" id="zoomBtn135" class="px-2.5 py-1 rounded-lg text-xs sm:text-sm font-bold bg-slate-800 text-slate-200 hover:bg-slate-700 transition">拡大 1.35x</button>
+              <button type="button" onclick="setMapZoom(1.7)" id="zoomBtn170" class="px-2.5 py-1 rounded-lg text-xs sm:text-sm font-bold bg-slate-800 text-slate-200 hover:bg-slate-700 transition">特大 1.7x</button>
+            </div>
+          </div>
+        </div>
+
+        <p class="text-xs sm:text-sm text-cyan-300 font-semibold mb-2.5 flex items-center gap-1.5">
+          <span>👆 地図上の番号ピン（①A〜①D、②〜⑩）をタップすると詳細が開きます</span>
+        </p>
+
+        <!-- SVG Map Frame (大型 viewBox="0 0 980 840") -->
+        <div id="mapScrollViewport" class="w-full bg-[#040915] rounded-2xl border border-slate-800 overflow-auto relative shadow-inner custom-scrollbar">
+          <div id="mapZoomWrapper" class="w-full transition-all duration-200 origin-top-left">
+            <svg id="sadoMapSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 840" preserveAspectRatio="xMidYMid meet" class="w-full h-auto select-none touch-manipulation block">
+              <defs>
+                <linearGradient id="oceanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#040b18"/>
+                  <stop offset="50%" stop-color="#07172e"/>
+                  <stop offset="100%" stop-color="#030812"/>
+                </linearGradient>
+                
+                <linearGradient id="islandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#1e293b"/>
+                  <stop offset="45%" stop-color="#334155"/>
+                  <stop offset="100%" stop-color="#1e293b"/>
+                </linearGradient>
+
+                <linearGradient id="windGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.95"/>
+                  <stop offset="100%" stop-color="#0284c7" stop-opacity="0.2"/>
+                </linearGradient>
+
+                <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="2" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.8"/>
+                </filter>
+                <filter id="glowRed" x="-30%" y="-30%" width="160%" height="160%">
+                  <feGaussianBlur stdDeviation="4" result="blur" />
+                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+              </defs>
+
+              <!-- 海洋背景 -->
+              <rect width="980" height="840" fill="url(#oceanGrad)"/>
+
+              <!-- 海洋グリッド線 -->
+              <g stroke="#1e293b" stroke-width="0.8" opacity="0.5">
+                <line x1="0" y1="160" x2="980" y2="160" stroke-dasharray="5 9"/>
+                <line x1="0" y1="320" x2="980" y2="320" stroke-dasharray="5 9"/>
+                <line x1="0" y1="480" x2="980" y2="480" stroke-dasharray="5 9"/>
+                <line x1="0" y1="640" x2="980" y2="640" stroke-dasharray="5 9"/>
+                <line x1="190" y1="0" x2="190" y2="840" stroke-dasharray="5 9"/>
+                <line x1="380" y1="0" x2="380" y2="840" stroke-dasharray="5 9"/>
+                <line x1="570" y1="0" x2="570" y2="840" stroke-dasharray="5 9"/>
+                <line x1="760" y1="0" x2="760" y2="840" stroke-dasharray="5 9"/>
+              </g>
+
+              <!-- 北西季節風ベクトル＆海況ガイド（左上海域 x:22, y:20）大文字化 -->
+              <g transform="translate(22, 20)" filter="url(#shadow)">
+                <rect width="380" height="114" rx="14" fill="#0b152c" stroke="#0284c7" stroke-width="1.8" opacity="0.96"/>
+                <text x="18" y="30" fill="#38bdf8" font-size="16" font-weight="900">秋季気象：北西季節風とうねり</text>
+                <text x="18" y="54" fill="#e2e8f0" font-size="13.5" font-weight="600">西〜北西岸（平根崎・稲鯨・長手）は波高増大傾向</text>
+                <text x="18" y="77" fill="#7dd3fc" font-size="13.5" font-weight="700">完全風裏: ①東海岸（風島・両津・水津・赤泊/野崎鼻）</text>
+                <text x="18" y="100" fill="#fde047" font-size="13.5" font-weight="700">南岸風裏: ⑩強清水（外洋西うねり・波高事前確認）</text>
+                <path d="M 318 24 L 364 58" stroke="url(#windGrad)" stroke-width="4.5" stroke-linecap="round"/>
+                <polygon points="367,61 351,55 359,45" fill="#38bdf8"/>
+              </g>
+
+              <!-- 方位記号 (右上) -->
+              <g transform="translate(925, 58)">
+                <circle cx="0" cy="0" r="24" fill="#0b1120" stroke="#475569" stroke-width="1.5" filter="url(#shadow)"/>
+                <polygon points="0,-18 5,0 0,-4" fill="#ef4444"/>
+                <polygon points="0,18 5,0 0,4" fill="#64748b"/>
+                <polygon points="-18,0 0,5 -4,0" fill="#64748b"/>
+                <polygon points="18,0 0,5 4,0" fill="#64748b"/>
+                <text x="0" y="-22" fill="#ef4444" font-size="13" font-weight="900" text-anchor="middle">N</text>
+              </g>
+
+              <!-- 佐渡島 陸地（大きく拡大配置） -->
+              <path d="M 730,52 C 645,160 540,160 420,210 C 350,240 285,330 268,405 C 250,480 295,560 228,660 C 195,705 240,768 330,745 C 420,720 510,640 595,580 C 735,480 885,410 860,340 C 835,275 760,205 730,52 Z" 
+                    fill="none" stroke="#0ea5e9" stroke-width="24" opacity="0.08"/>
+
+              <path id="sadoLand" filter="url(#shadow)" fill="url(#islandGrad)" stroke="#64748b" stroke-width="3" stroke-linejoin="round"
+                    d="M 730 58 
+                       C 702 105, 652 168, 596 208 
+                       C 552 236, 502 174, 458 190 
+                       C 414 208, 386 270, 358 304 
+                       C 336 332, 302 360, 296 384 
+                       C 290 402, 308 418, 330 424 
+                       C 364 435, 402 406, 436 412 
+                       C 452 415, 446 446, 414 468 
+                       C 374 496, 320 525, 292 582 
+                       C 264 638, 242 678, 225 712 
+                       C 220 740, 258 756, 302 740 
+                       C 348 722, 392 688, 452 660 
+                       C 525 626, 608 570, 696 512 
+                       C 785 456, 856 410, 868 370 
+                       C 878 332, 840 315, 812 326 
+                       C 772 344, 718 360, 662 348 
+                       C 628 342, 628 315, 645 280 
+                       C 672 224, 730 138, 730 58 Z" />
+
+              <!-- 大佐渡・小佐渡山脈の防風壁ライン -->
+              <path d="M 705 92 Q 552 206 408 275" fill="none" stroke="#1e293b" stroke-width="6" stroke-linecap="round" opacity="0.65"/>
+              <text x="545" y="192" fill="#94a3b8" font-size="13.5" font-weight="800" transform="rotate(-24 545 192)" opacity="0.85">大佐渡山脈 (防風壁)</text>
+
+              <path d="M 285 685 Q 465 625 815 360" fill="none" stroke="#1e293b" stroke-width="6" stroke-linecap="round" opacity="0.65"/>
+              <text x="530" y="555" fill="#94a3b8" font-size="13.5" font-weight="800" transform="rotate(-27 530 555)" opacity="0.85">小佐渡山脈 (防風壁)</text>
+
+              <!-- 加茂湖 -->
+              <ellipse cx="628" cy="332" rx="28" ry="18" fill="#07172e" stroke="#64748b" stroke-width="2"/>
+              <text x="628" y="337" fill="#cbd5e1" font-size="12" font-weight="800" text-anchor="middle">加茂湖</text>
+
+              <!-- 海域ラベル（大文字化） -->
+              <text x="368" y="452" fill="#38bdf8" font-size="15" font-weight="800" opacity="0.85">真野湾</text>
+              <text x="702" y="312" fill="#38bdf8" font-size="15" font-weight="800" opacity="0.85">両津湾</text>
+              <text x="535" y="118" fill="#94a3b8" font-size="15" font-weight="800" opacity="0.7">外海府海岸</text>
+              <text x="235" y="655" fill="#cbd5e1" font-size="14" font-weight="800" opacity="0.85">小木半島</text>
+
+              <!-- ① 東海岸・完全風裏エリア ハイライトゾーン -->
+              <path d="M 655 315 Q 785 330 890 365 Q 895 450 790 500 Q 655 575 535 635" fill="none" stroke="#38bdf8" stroke-width="12" stroke-linecap="round" stroke-dasharray="10 10" opacity="0.28"/>
+              <g transform="translate(690, 238)" filter="url(#shadow)">
+                <rect width="268" height="36" rx="10" fill="#082f49" stroke="#38bdf8" stroke-width="2" opacity="0.96"/>
+                <text x="134" y="23" fill="#7dd3fc" font-size="14.5" font-weight="900" text-anchor="middle">🛡️ ① 東海岸・完全風裏エリア (4拠点)</text>
+              </g>
+
+              <!-- 拠点からの到達時間同心円 -->
+              <g id="travelRadiusRings" stroke="#ef4444" fill="none" opacity="0.28">
+                <circle cx="420" cy="405" r="70" stroke-dasharray="4 6" stroke-width="1.8"/>
+                <circle cx="420" cy="405" r="145" stroke-dasharray="5 7" stroke-width="1.8"/>
+                <circle cx="420" cy="405" r="235" stroke-dasharray="6 8" stroke-width="1.8"/>
+                <circle cx="420" cy="405" r="345" stroke-dasharray="7 9" stroke-width="1.8"/>
+              </g>
+
+              <!-- 凡例ボックス (右下外海沖合 x:635, y:595) 大文字化＆強清水と完全分離 -->
+              <g transform="translate(635, 595)" filter="url(#shadow)">
+                <rect width="322" height="222" rx="16" fill="#091224" stroke="#334155" stroke-width="1.8" opacity="0.97"/>
+                <text x="20" y="32" fill="#ffffff" font-size="16" font-weight="900">釣り場分類・凡例</text>
+                
+                <g transform="translate(20, 58)">
+                  <circle cx="10" cy="0" r="9" fill="#0284c7" stroke="#ffffff" stroke-width="2"/>
+                  <text x="28" y="5" fill="#bae6fd" font-size="14" font-weight="700">安全堤防・東海岸風裏 (①,⑤,⑥,⑦)</text>
+                </g>
+                <g transform="translate(20, 92)">
+                  <circle cx="10" cy="0" r="9" fill="#10b981" stroke="#ffffff" stroke-width="2"/>
+                  <text x="28" y="5" fill="#a7f3d0" font-size="14" font-weight="700">平磯・低磯 (②,③,④,⑨)</text>
+                </g>
+                <g transform="translate(20, 126)">
+                  <circle cx="10" cy="0" r="9" fill="#f59e0b" stroke="#ffffff" stroke-width="2"/>
+                  <text x="28" y="5" fill="#fde68a" font-size="14" font-weight="700">本格外洋磯 (⑧平根崎, ⑩強清水)</text>
+                </g>
+                <g transform="translate(20, 160)">
+                  <circle cx="10" cy="0" r="9" fill="#ef4444" stroke="#ffffff" stroke-width="2"/>
+                  <text x="28" y="5" fill="#fca5a5" font-size="14" font-weight="900">★ 宿泊拠点: ヴィンセント (佐和田)</text>
+                </g>
+                <line x1="20" y1="182" x2="302" y2="182" stroke="#1e293b" stroke-width="1.5"/>
+                <text x="20" y="204" fill="#94a3b8" font-size="12.5" font-weight="600">※番号ピンをタップで詳細表示（×で閉じても番号維持）</text>
+              </g>
+
+              <!-- ★ 宿泊拠点マーカー：ヴィンセント (x:420, y:405) -->
+              <g id="baseVincent" transform="translate(420, 405)">
+                <circle cx="0" cy="0" r="18" fill="none" stroke="#ef4444" stroke-width="2.5" class="pulse-ring-red"/>
+                <circle cx="0" cy="0" r="12" fill="#ef4444" stroke="#ffffff" stroke-width="2.5" filter="url(#glowRed)"/>
+                <polygon points="0,-7 6,4 -6,4" fill="#ffffff"/>
+                <g transform="translate(18, -22)" filter="url(#shadow)">
+                  <rect width="182" height="42" rx="10" fill="#180910" stroke="#ef4444" stroke-width="2"/>
+                  <text x="12" y="17" fill="#fca5a5" font-size="12.5" font-weight="900">★ 宿泊拠点 (移動基準)</text>
+                  <text x="12" y="34" fill="#ffffff" font-size="13.5" font-weight="900">ヴィンセント (佐和田)</text>
+                </g>
+              </g>
+
+              <!-- ========================================================================= -->
+              <!-- ① 東海岸・完全風裏エリア (1A:風島 / 1B:両津・姫崎 / 1C:水津 / 1D:赤泊・野崎鼻) -->
+              <!-- ========================================================================= -->
+
+              <!-- ①-B 両津港(南防波堤)・姫崎灯台下 (車25〜30分) -->
+              <g id="pin-1B" class="map-pin spot-pin-group" data-spot-id="1" data-sub-id="1B" transform="translate(668, 355)" onclick="handlePinInteraction(1, '1B')">
+                <circle cx="0" cy="0" r="34" fill="transparent" pointer-events="all"/>
+                <circle class="pin-glow-ring" cx="0" cy="0" r="28" fill="none" stroke="#38bdf8" stroke-width="4"/>
+                <circle class="pin-circle" cx="0" cy="0" r="20" fill="#0284c7" stroke="#ffffff" stroke-width="3" filter="url(#shadow)"/>
+                <text class="pin-number" data-label="1B" x="0" y="6" fill="#ffffff" font-size="16" font-weight="900" text-anchor="middle">1B</text>
+                <g transform="translate(26, -16)" pointer-events="none">
+                  <rect width="205" height="32" rx="16" fill="#081b33" stroke="#38bdf8" stroke-width="1.8" opacity="0.96" filter="url(#shadow)"/>
+                  <text x="102" y="21" fill="#bae6fd" font-size="14" font-weight="900" text-anchor="middle">①-B 両津港・姫崎 [25分]</text>
+                </g>
+              </g>
+
+              <!-- ①-A 赤亀・風島なぎさ公園 (旧⑦統合 / 車30〜35分) -->
+              <g id="pin-1A" class="map-pin spot-pin-group" data-spot-id="1" data-sub-id="1A" transform="translate(762, 398)" onclick="handlePinInteraction(1, '1A')">
+                <circle cx="0" cy="0" r="34" fill="transparent" pointer-events="all"/>
+                <circle class="pin-glow-ring" cx="0" cy="0" r="28" fill="none" stroke="#38bdf8" stroke-width="4"/>
+                <circle class="pin-circle" cx="0" cy="0" r="21" fill="#0284c7" stroke="#ffffff" stroke-width="3" filter="url(#shadow)"/>
+                <text class="pin-number" data-label="1A" x="0" y="6" fill="#ffffff" font-size="16" font-weight="900" text-anchor="middle">1A</text>
+                <g transform="translate(-235, -38)" pointer-events="none">
+                  <rect width="218" height="32" rx="16" fill="#081b33" stroke="#38bdf8" stroke-width="1.8" opacity="0.96" filter="url(#shadow)"/>
+                  <text x="109" y="21" fill="#bae6fd" font-size="14" font-weight="900" text-anchor="middle">①-A 風島なぎさ公園 [30分]</text>
+                </g>
+              </g>
+
+              <!-- ①-C 水津港周辺 (車45〜50分) -->
+              <g id="pin-1C" class="map-pin spot-pin-group" data-spot-id="1" data-sub-id="1C" transform="translate(822, 442)" onclick="handlePinInteraction(1, '1C')">
+                <circle cx="0" cy="0" r="34" fill="transparent" pointer-events="all"/>
+                <circle class="pin-glow-ring" cx="0" cy="0" r="28" fill="none" stroke="#38bdf8" stroke-width="4"/>
+                <circle class="pin-circle" cx="0" cy="0" r="20" fill="#0284c7" stroke="#ffffff" stroke-width="3" filter="url(#shadow)"/>
+                <text class="pin-number" data-label="1C" x="0" y="6" fill="#ffffff" font-size="16" font-weight="900" text-anchor="middle">1C</text>
+                <g transform="translate(-212, 16)" pointer-events="none">
+                  <rect width="198" height="32" rx="16" fill="#081b33" stroke="#38bdf8" stroke-width="1.8" opacity="0.96" filter="url(#shadow)"/>
+                  <text x="99" y="21" fill="#bae6fd" font-size="14" font-weight="900" text-anchor="middle">①-C 水津港周辺 [45分]</text>
+                </g>
+              </g>
+
+              <!-- ①-D 赤泊港 ＆ 野崎鼻地磯 (車45〜60分) -->
+              <g id="pin-1D" class="map-pin spot-pin-group" data-spot-id="1" data-sub-id="1D" transform="translate(612, 558)" onclick="handlePinInteraction(1, '1D')">
+                <circle cx="0" cy="0" r="34" fill="transparent" pointer-events="all"/>
+                <circle class="pin-glow-ring" cx="0" cy="0" r="28" fill="none" stroke="#38bdf8" stroke-width="4"/>
+                <circle class="pin-circle" cx="0" cy="0" r="20" fill="#0284c7" stroke="#ffffff" stroke-width="3" filter="url(#shadow)"/>
+                <text class="pin-number" data-label="1D" x="0" y="6" fill="#ffffff" font-size="16" font-weight="900" text-anchor="middle">1D</text>
+                <g transform="translate(26, -16)" pointer-events="none">
+                  <rect width="236" height="32" rx="16" fill="#081b33" stroke="#38bdf8" stroke-width="1.8" opacity="0.96" filter="url(#shadow)"/>
+                  <text x="118" y="21" fill="#bae6fd" font-size="14" font-weight="900" text-anchor="middle">①-D 赤泊港・野崎鼻 [50分]</text>
+                </g>
+              </g>
+
+              <!-- ========================================================================= -->
+              <!-- ②〜⑩ 西海岸・真野湾・外海府・小木半島スポット -->
+              <!-- ========================================================================= -->
+
+              <!-- ② 長手岬 (平磯: エメラルド) -->
+              <g id="pin-2" class="map-pin spot-pin-group" data-spot-id="2" transform="translate(298, 422)" onclick="handlePinInteraction(2)">
+                <circle cx="0" cy="0" r="34" fill="transparent" pointer-events="all"/>
+                <circle class="pin-glow-ring" cx="0" cy="0" r="28" fill="none" stroke="#34d399" stroke-width="4"/>
+                <circle class="pin-circle" cx="0" cy="0" r="20" fill="#10b981" stroke="#ffffff" stroke-width="3" filter="url(#shadow)"/>
+                <text class="pin-number" data-label="2" x="0" y="7" fill="#ffffff" font-size="19" font-weight="900" text-anchor="middle">2</text>
+                <g transform="translate(-196, -16)" pointer-events="none">
+                  <rect width="172" height="32" rx="16" fill="#091926" stroke="#10b981" stroke-width="1.8" opacity="0.96" filter="url(#shadow)"/>
+                  <text x="86" y="21" fill="#6ee7b7" font-size="14.5" font-weight="900" text-anchor="middle">② 長手岬 (平磯)</text>
+                </g>
+              </g>
+
+              <!-- ③ 稲鯨 (平磯+堤防: エメラルド) -->
+              <g id="pin-3" class="map-pin spot-pin-group" data-spot-id="3" transform="translate(314, 368)" onclick="handlePinInteraction(3)">
+                <circle cx="0" cy="0" r="34" fill="transparent" pointer-events="all"/>
+                <circle class="pin-glow-ring" cx="0" cy="0" r="28" fill="none" stroke="#34d399" stroke-width="4"/>
+                <circle class="pin-circle" cx="0" cy="0" r="20" fill="#10b981" stroke="#ffffff" stroke-width="3" filter="url(#shadow)"/>
+                <text class="pin-number" data-label="3" x="0" y="7" fill="#ffffff" font-size="19" font-weight="900" text-anchor="middle">3</text>
+                <g transform="translate(-214, -16)" pointer-events="none">
+                  <rect width="190" height="32" rx="16" fill="#091926" stroke="#10b981" stroke-width="1.8" opacity="0.96" filter="url(#shadow)"/>
+                  <text x="95" y="21" fill="#6ee7b7" font-size="14.5" font-weight="900" text-anchor="middle">③ 稲鯨 (平磯・堤防)</text>
+                </g>
+              </g>
+
+              <!-- ④ 相川下戸 (平磯: エメラルド) -->
+              <g id="pin-4" class="map-pin spot-pin-group" data-spot-id="4" transform="translate(348, 322)" onclick="handlePinInteraction(4)">
+                <circle cx="0" cy="0" r="34" fill="transparent" pointer-events="all"/>
+                <circle class="pin-glow-ring" cx="0" cy="0" r="28" fill="none" stroke="#34d399" stroke-width="4"/>
+                <circle class="pin-circle" cx="0" cy="0" r="20" fill="#10b981" stroke="#ffffff" stroke-width="3" filter="url(#shadow)"/>
+                <text class="pin-number" data-label="4" x="0" y="7" fill="#ffffff" font-size="19" font-weight="900" text-anchor="middle">4</text>
+                <g transform="translate(-198, -16)" pointer-events="none">
+                  <rect width="174" height="32" rx="16" fill="#091926" stroke="#10b981" stroke-width="1.8" opacity="0.96" filter="url(#shadow)"/>
+                  <text x="87" y="21" fill="#6ee7b7" font-size="14.5" font-weight="900" text-anchor="middle">④ 相川下戸 (岩礁)</text>
+                </g>
+              </g>
+
+              <!-- ⑤ 相川港・周辺堤防 (安全堤防: スカイブルー) -->
+              <g id="pin-5" class="map-pin spot-pin-group" data-spot-id="5" transform="translate(368, 274)" onclick="handlePinInteraction(5)">
+                <circle cx="0" cy="0" r="34" fill="transparent" pointer-events="all"/>
+                <circle class="pin-glow-ring" cx="0" cy="0" r="28" fill="none" stroke="#38bdf8" stroke-width="4"/>
+                <circle class="pin-circle" cx="0" cy="0" r="20" fill="#0284c7" stroke="#ffffff" stroke-width="3" filter="url(#shadow)"/>
+                <text class="pin-number" data-label="5" x="0" y="7" fill="#ffffff" font-size="19" font-weight="900" text-anchor="middle">5</text>
+                <g transform="translate(-194, -18)" pointer-events="none">
+                  <rect width="170" height="32" rx="16" fill="#081b33" stroke="#0284c7" stroke-width="1.8" opacity="0.96" filter="url(#shadow)"/>
+                  <text x="85" y="21" fill="#7dd3fc" font-size="14.5" font-weight="900" text-anchor="middle">⑤ 相川港 (堤防)</text>
+                </g>
+              </g>
+
+              <!-- ⑥ 佐和田・沢根堤防 (安全堤防: スカイブルー) -->
+              <g id="pin-6" class="map-pin spot-pin-group" data-spot-id="6" transform="translate(382, 396)" onclick="handlePinInteraction(6)">
+                <circle cx="0" cy="0" r="34" fill="transparent" pointer-events="all"/>
+                <circle class="pin-glow-ring" cx="0" cy="0" r="28" fill="none" stroke="#38bdf8" stroke-width="4"/>
+                <circle class="pin-circle" cx="0" cy="0" r="20" fill="#0284c7" stroke="#ffffff" stroke-width="3" filter="url(#shadow)"/>
+                <text class="pin-number" data-label="6" x="0" y="7" fill="#ffffff" font-size="19" font-weight="900" text-anchor="middle">6</text>
+                <g transform="translate(-185, -48)" pointer-events="none">
+                  <rect width="188" height="32" rx="16" fill="#081b33" stroke="#0284c7" stroke-width="1.8" opacity="0.96" filter="url(#shadow)"/>
+                  <text x="94" y="21" fill="#7dd3fc" font-size="14.5" font-weight="900" text-anchor="middle">⑥ 佐和田・沢根 (堤防)</text>
+                </g>
+              </g>
+
+              <!-- ⑦ 真野湾堤防 (安全堤防: スカイブルー) -->
+              <g id="pin-7" class="map-pin spot-pin-group" data-spot-id="7" transform="translate(432, 468)" onclick="handlePinInteraction(7)">
+                <circle cx="0" cy="0" r="34" fill="transparent" pointer-events="all"/>
+                <circle class="pin-glow-ring" cx="0" cy="0" r="28" fill="none" stroke="#38bdf8" stroke-width="4"/>
+                <circle class="pin-circle" cx="0" cy="0" r="20" fill="#0284c7" stroke="#ffffff" stroke-width="3" filter="url(#shadow)"/>
+                <text class="pin-number" data-label="7" x="0" y="7" fill="#ffffff" font-size="19" font-weight="900" text-anchor="middle">7</text>
+                <g transform="translate(24, -14)" pointer-events="none">
+                  <rect width="192" height="32" rx="16" fill="#081b33" stroke="#0284c7" stroke-width="1.8" opacity="0.96" filter="url(#shadow)"/>
+                  <text x="96" y="21" fill="#7dd3fc" font-size="14.5" font-weight="900" text-anchor="middle">⑦ 真野湾 (河口突堤)</text>
+                </g>
+              </g>
+
+              <!-- ⑧ 平根崎 (本格外洋磯: アンバー) -->
+              <g id="pin-8" class="map-pin spot-pin-group" data-spot-id="8" transform="translate(442, 198)" onclick="handlePinInteraction(8)">
+                <circle cx="0" cy="0" r="34" fill="transparent" pointer-events="all"/>
+                <circle class="pin-glow-ring" cx="0" cy="0" r="28" fill="none" stroke="#fbbf24" stroke-width="4"/>
+                <circle class="pin-circle" cx="0" cy="0" r="20" fill="#f59e0b" stroke="#ffffff" stroke-width="3" filter="url(#shadow)"/>
+                <text class="pin-number" data-label="8" x="0" y="7" fill="#ffffff" font-size="19" font-weight="900" text-anchor="middle">8</text>
+                <g transform="translate(-202, -18)" pointer-events="none">
+                  <rect width="178" height="32" rx="16" fill="#1f1608" stroke="#f59e0b" stroke-width="1.8" opacity="0.96" filter="url(#shadow)"/>
+                  <text x="89" y="21" fill="#fde68a" font-size="14.5" font-weight="900" text-anchor="middle">⑧ 平根崎 (外洋磯)</text>
+                </g>
+              </g>
+
+              <!-- ⑨ 千畳敷 (平磯: エメラルド) -->
+              <g id="pin-9" class="map-pin spot-pin-group" data-spot-id="9" transform="translate(495, 162)" onclick="handlePinInteraction(9)">
+                <circle cx="0" cy="0" r="34" fill="transparent" pointer-events="all"/>
+                <circle class="pin-glow-ring" cx="0" cy="0" r="28" fill="none" stroke="#34d399" stroke-width="4"/>
+                <circle class="pin-circle" cx="0" cy="0" r="20" fill="#10b981" stroke="#ffffff" stroke-width="3" filter="url(#shadow)"/>
+                <text class="pin-number" data-label="9" x="0" y="7" fill="#ffffff" font-size="19" font-weight="900" text-anchor="middle">9</text>
+                <g transform="translate(26, -16)" pointer-events="none">
+                  <rect width="172" height="32" rx="16" fill="#091926" stroke="#10b981" stroke-width="1.8" opacity="0.96" filter="url(#shadow)"/>
+                  <text x="86" y="21" fill="#6ee7b7" font-size="14.5" font-weight="900" text-anchor="middle">⑨ 千畳敷 (平磯)</text>
+                </g>
+              </g>
+
+              <!-- ⑩ 強清水 (本格外洋・南岸風裏平磯: アンバー) -->
+              <g id="pin-10" class="map-pin spot-pin-group" data-spot-id="10" transform="translate(245, 738)" onclick="handlePinInteraction(10)">
+                <circle cx="0" cy="0" r="36" fill="transparent" pointer-events="all"/>
+                <circle class="pin-glow-ring" cx="0" cy="0" r="30" fill="none" stroke="#fbbf24" stroke-width="4"/>
+                <circle class="pin-circle" cx="0" cy="0" r="22" fill="#f59e0b" stroke="#ffffff" stroke-width="3" filter="url(#shadow)"/>
+                <text class="pin-number" data-label="10" x="0" y="7" fill="#ffffff" font-size="18" font-weight="900" text-anchor="middle">10</text>
+                <g transform="translate(28, -18)" pointer-events="none">
+                  <rect width="318" height="36" rx="18" fill="#1f1608" stroke="#f59e0b" stroke-width="2" opacity="0.98" filter="url(#shadow)"/>
+                  <text x="159" y="23" fill="#fde047" font-size="14.5" font-weight="900" text-anchor="middle">⑩ 強清水 (こわしみず) [南岸風裏]</text>
+                </g>
+              </g>
+
+            </svg>
+          </div>
+        </div>
+
+        <!-- 秋季の風・うねり対策ガイド：1の東海岸代替案を大幅拡充＆大文字化 -->
+        <div class="mt-4 p-4 sm:p-5 rounded-2xl bg-slate-950/90 border border-slate-800 text-slate-200 space-y-3.5">
+          <div class="flex items-center gap-2.5 text-cyan-300 font-black text-base sm:text-lg">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>秋季の風・うねり対策ガイド（西海岸荒天時の代替プラン）</span>
+          </div>
+          <div class="grid grid-cols-1 gap-3.5 text-sm sm:text-base">
+            <div class="bg-slate-900 p-4 rounded-xl border border-sky-500/40 space-y-2">
+              <span class="text-sky-300 font-black block text-base sm:text-lg">① 東海岸・完全風裏エリア（ヴィンセントから25〜60分圏・カゴ＆エギング代替4選）</span>
+              <p class="leading-relaxed text-slate-200">
+                北西季節風が強い日でも、大佐渡・小佐渡山脈が風と波を遮断するため東海岸は別世界のように穏やかになります。どうしても東海岸しか竿を出せない日は以下の4拠点を状況に応じて使い分けられます：
+              </p>
+              <ul class="space-y-1.5 text-slate-300 pl-1 pt-1">
+                <li>・<strong class="text-white">①-A 赤亀・風島なぎさ公園（車30〜35分）</strong>：石積堤と藻場が隣接。エギングの秋イカ実績抜群＆先端カゴ釣りでマダイ・クロダイ。</li>
+                <li>・<strong class="text-white">①-B 両津港南防波堤 ＆ 姫崎灯台下（車25〜30分）</strong>：最短の鉄壁風裏。防波堤外向きのカゴ釣り（青物・アジ・マダイ）や姫崎の地磯エギングに好適。</li>
+                <li>・<strong class="text-white">①-C 水津港周辺（車45〜50分）</strong>：東海岸南東端の潮通し抜群エリア。小佐渡山脈が北西風をブロックし、カゴの回遊魚＆湾内藻場エギングが成立。</li>
+                <li>・<strong class="text-white">①-D 赤泊港 ＆ 野崎鼻地磯（車45〜60分）</strong>：南東岸の最終切り札。足場抜群の赤泊港堤防と、沖40mの沈み根に本流が当たる「野崎鼻（野崎トンネル外側）」で大型マダイのカゴ釣り＆回遊アオリイカの3.0〜3.5号エギングが両立。</li>
+              </ul>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-1.5">
+                <span class="text-sky-300 font-black block text-base">② 真野湾奥（⑥沢根・⑦真野湾堤防）</span>
+                <p class="leading-relaxed text-slate-300">北〜北北西風を背負えるため水面が落ち着きやすく、拠点から車5〜15分ですぐに竿出し可能な手軽な風裏です。</p>
+              </div>
+              <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-1.5">
+                <span class="text-amber-300 font-black block text-base">③ 南岸（⑩強清水）</span>
+                <p class="leading-relaxed text-slate-300">小木半島の台地で北寄り風を遮断。外洋の西うねりが回り込む場合があるため、直前の波高予報（1.5m以内目安）を確認してエントリーしましょう。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右：スポット詳細リストカード（5カラム分・大文字化） -->
+      <div class="xl:col-span-5 flex flex-col space-y-4 max-h-[960px] overflow-y-auto pr-1 custom-scrollbar" id="spotCardsContainer">
+        <!-- JavaScriptによる動的レンダリング -->
+      </div>
+
+    </div>
+
+    <!-- 一覧表テーブル（トグル表示・大文字化） -->
+    <div id="tableViewContainer" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-2xl overflow-hidden">
+      <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+        <div>
+          <h2 class="text-lg sm:text-xl font-black text-white flex items-center gap-2">
+            <span>全10箇所 釣り場パラメータ総括比較表</span>
+          </h2>
+          <p class="text-sm sm:text-base text-slate-300 mt-0.5">ヴィンセント基準の移動時間・対象魚・カゴ＆エギング適性</p>
+        </div>
+        <button id="btnBackToMap" class="text-sm sm:text-base font-bold bg-slate-800 hover:bg-slate-700 text-cyan-300 px-4 py-2.5 rounded-xl border border-slate-700 transition active:scale-95">
+          ← マップ分割表示に戻る
+        </button>
+      </div>
+
+      <div class="text-sm text-cyan-300 font-bold mb-2.5 sm:hidden flex items-center gap-1.5">
+        <span>👈 表を左右にスワイプして全体を確認できます 👉</span>
+      </div>
+
+      <div class="overflow-x-auto custom-scrollbar border border-slate-800 rounded-xl">
+        <table class="w-full text-left text-sm sm:text-base border-collapse whitespace-nowrap xl:whitespace-normal">
+          <thead>
+            <tr class="border-b border-slate-700 bg-slate-950 text-slate-200">
+              <th class="p-3.5 font-bold text-center w-14">No</th>
+              <th class="p-3.5 font-bold min-w-[170px]">ポイント名（読み）</th>
+              <th class="p-3.5 font-bold min-w-[140px]">分類</th>
+              <th class="p-3.5 font-bold min-w-[140px]">所要時間 / 距離</th>
+              <th class="p-3.5 font-bold min-w-[140px]">カゴ釣り適性</th>
+              <th class="p-3.5 font-bold min-w-[140px]">エギング適性</th>
+              <th class="p-3.5 font-bold min-w-[150px]">足場・平坦度</th>
+              <th class="p-3.5 font-bold min-w-[180px]">主な秋ターゲット</th>
+              <th class="p-3.5 font-bold min-w-[280px]">地形特徴・海況ガイド</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody" class="divide-y divide-slate-800/80 text-slate-100">
+            <!-- JavaScriptによる動的レンダリング -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 戦術比較サマリー（大文字化） -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm sm:text-base">
+      <div class="p-4 sm:p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2">
+        <div class="flex items-center gap-2 text-emerald-400 font-black text-base sm:text-lg">
+          <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          平磯×カゴ釣り成立の条件
+        </div>
+        <p class="text-slate-200 leading-relaxed">
+          平磯は水深が浅く手前の沈み根が張り出すため、近投では根掛かりしやすくなります。<strong class="text-emerald-300">⑨千畳敷</strong>や<strong class="text-amber-300">⑩強清水</strong>のように沖にブレイクがある磯を選ぶか、<strong class="text-emerald-300">③稲鯨</strong>のように60〜80m遠投で沖根の間を射抜く戦術が有効です。
+        </p>
+      </div>
+
+      <div class="p-4 sm:p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2">
+        <div class="flex items-center gap-2 text-sky-400 font-black text-base sm:text-lg">
+          <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          平磯×エギング制圧の条件
+        </div>
+        <p class="text-slate-200 leading-relaxed">
+          <strong class="text-emerald-300">②長手岬</strong>や<strong class="text-emerald-300">③稲鯨</strong>はアオリイカの絶好の捕食ゾーンです。
+          シャロータイプのエギを用い、スリット（溝）やホンダワラの上を通すアプローチが効果的。平磯は足場が低いため、満潮前後の潮位変化を確認しながら釣座を選びましょう。
+        </p>
+      </div>
+
+      <div class="p-4 sm:p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2">
+        <div class="flex items-center gap-2 text-cyan-400 font-black text-base sm:text-lg">
+          <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          東海岸風裏（①）への切り替え判断
+        </div>
+        <p class="text-slate-200 leading-relaxed">
+          西〜北西風で西海岸に白波が立つ日は、迷わず<strong class="text-sky-300">①東海岸・完全風裏エリア（風島・両津・水津・赤泊/野崎鼻）</strong>へ転進するのが正解です。1時間圏内でカゴ釣りのマダイ・青物と藻場エギングを高水準で両立できます。
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- フッター -->
+  <footer class="border-t border-slate-800 bg-slate-950 py-5 text-center text-sm sm:text-base text-slate-400 mb-16 lg:mb-0">
+    <p>佐渡島フィッシングマップ ｜ 拠点: ヴィンセント（佐和田・中原）</p>
+  </footer>
+
+  <!-- ポップアップ・ボトムシート（見やすい大文字＆×ボタンで閉じてもピン番号が消えない安全設計） -->
+  <div id="bottomSheetBackdrop" onclick="closeBottomSheet()" class="fixed inset-0 bg-black/65 backdrop-blur-sm z-50 transition-opacity duration-300 opacity-0 pointer-events-none"></div>
+
+  <div id="mobileBottomSheet" class="fixed inset-x-0 bottom-0 z-50 transform translate-y-full transition-transform duration-300 ease-out bg-slate-900 border-t-2 border-cyan-500/70 rounded-t-3xl shadow-2xl p-5 sm:p-6 max-w-2xl mx-auto max-h-[85vh] overflow-y-auto custom-scrollbar select-none">
+    <div class="w-14 h-1.5 bg-slate-700 rounded-full mx-auto mb-4 cursor-pointer" onclick="closeBottomSheet()"></div>
+    <div id="bottomSheetContent" class="space-y-4">
+      <!-- JavaScriptで動的生成 -->
+    </div>
+  </div>
+
+  <!-- アプリケーションロジック -->
+  <script>
+    const spotsData = [
+      {
+        id: 1,
+        name: "東海岸・完全風裏エリア（風島・両津・水津・赤泊/野崎鼻）",
+        reading: "ひがしかいがん・かざしま / りょうつ / すいづ / あかどまり・のざきばな",
+        type: "pier",
+        typeName: "完全風裏・堤防＆地磯（旧⑦統合＋東海岸代替4選）",
+        categoryColor: "text-sky-400",
+        badgeColor: "bg-sky-500/20 text-sky-300 border-sky-500/40",
+        pinColor: "#0284c7",
+        distanceKm: 22,
+        timeMin: 30,
+        timeText: "約25〜60分（16〜32km）",
+        footing: "整備された公園突堤・大型防波堤から潮通しの良い平磯まで、状況に応じて安全に選択可能。",
+        footingLevel: 4.9,
+        kagoFit: 4.5,
+        kagoDesc: "両津港・水津港・赤泊港の防波堤先端や、野崎鼻の潮目を直撃してマダイ・クロダイ・青物・良型アジが狙える。",
+        egingFit: 4.8,
+        egingDesc: "風島なぎさ公園の藻場、姫崎・野崎鼻の岩礁スリット、各漁港スロープ周りに秋アオリイカが豊富。",
+        targets: ["アオリイカ", "マダイ", "クロダイ", "アジ", "イナダ/青物", "メバル"],
+        isWindShelter: true,
+        shelterNote: "大佐渡・小佐渡山脈が北西風を完全遮断する最強風裏",
+        desc: "北西の季節風で西海岸が荒れた際、ヴィンセントから車で約25分〜1時間圏内でカゴ釣りとエギングを快適に成立させる「東海岸・完全風裏」の統合エリアです（旧⑦風島なぎさ公園を含む4拠点を網羅）。",
+        safetyNote: "各港湾の立入禁止フェンス区間（両津港一部・水津港北堤など）は避け、開放堤防・親水突堤・地磯で楽しみましょう。",
+        subSpots: [
+          {
+            code: "1A",
+            title: "①-A 赤亀・風島なぎさ公園（旧⑦統合）",
+            access: "ヴィンセントから車で約30〜35分（約22km）",
+            feature: "公式ガイドでも「足場もよくいろんな魚が狙える」と推奨される親水突堤・石積堤と浅場岩礁帯。ホンダワラ等の藻場が濃く秋エギングの実績抜群。突堤先端は水深・潮通しともに良くカゴ釣りでクロダイ・マダイ・アジが狙えます。"
+          },
+          {
+            code: "1B",
+            title: "①-B 両津港（南防波堤）＆ 姫崎灯台下（津神島周辺）",
+            access: "ヴィンセントから車で約25〜30分（約16〜20km）",
+            feature: "東海岸で最も近い鉄壁の風裏。両津港の開放防波堤では足元から水深がありカゴ釣り（アジ・クロダイ・マダイ・青物）と常夜灯エギングが安定。さらに東の姫崎灯台下・津神島周辺は浅場岩礁と海藻帯が広がり、エギングとウキ・カゴ釣りの好ポイントです。"
+          },
+          {
+            code: "1C",
+            title: "①-C 水津港（すいづこう）周辺",
+            access: "ヴィンセントから車で約45〜50分（約29km）",
+            feature: "東海岸の南東端（水津岬）に位置し、背後の小佐渡山脈が北西風を強力にブロック。岬先端で本流が近く、防波堤からの遠投カゴ釣りでマダイ・青物・大アジの回遊が期待できるほか、港内〜外周の藻場でアオリイカのエギングも好調です。"
+          },
+          {
+            code: "1D",
+            title: "①-D 赤泊港 ＆ 野崎鼻（のざきばな）地磯",
+            access: "ヴィンセントから車で約45〜60分（約32km）",
+            feature: "小佐渡山脈の南東裏に隠れる最終切り札。赤泊港は長い防波堤で足場抜群・トイレ完備、カゴ釣り＆夜エギングに最適。また南西隣の「野崎鼻（野崎トンネル外側の地磯）」は沖40mの沈み根と速い潮流がぶつかり、カゴ釣りでの大型マダイ・青物と3.0〜3.5号エギでの回遊アオリイカが連発する一級平磯です。"
+          }
+        ]
+      },
+      {
+        id: 2,
+        name: "長手岬",
+        reading: "ながてみさき",
+        type: "hiraiso",
+        typeName: "平磯・波食棚",
+        categoryColor: "text-emerald-400",
+        badgeColor: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
+        pinColor: "#10b981",
+        distanceKm: 11,
+        timeMin: 18,
+        timeText: "約15〜25分",
+        footing: "比較的平坦で歩きやすい。起伏はあるが全体的に移動容易。七浦海岸代表。",
+        footingLevel: 4.2,
+        kagoFit: 3.5,
+        kagoDesc: "手前はシモリ（沈み根）が多いため50m以上の遠投が必要。クロダイ・マダイ狙い。",
+        egingFit: 5.0,
+        egingDesc: "浅場にスリットや海藻が点在しアオリイカの絶好のストック場。サイトも◎。",
+        targets: ["アオリイカ", "クロダイ", "メジナ", "メバル", "キジハタ"],
+        isWindShelter: false,
+        shelterNote: "西風・うねりが直接当たりやすい地形",
+        desc: "ぐるっと歩ける平坦な磯場。駐車場・トイレ完備でアクセス良好。足場は良いが西風や外洋うねりが入ると波を被りやすいため、直前の波予報を確認しておくと快適に楽しめます。",
+        safetyNote: "穏やかな凪日推奨。潮位と波の状況を確認しながら釣座を選びましょう。"
+      },
+      {
+        id: 3,
+        name: "稲鯨（堤防・外側岩場）",
+        reading: "いなくじら",
+        type: "hiraiso",
+        typeName: "平磯・低磯 ＋ 堤防",
+        categoryColor: "text-emerald-400",
+        badgeColor: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
+        pinColor: "#10b981",
+        distanceKm: 13,
+        timeMin: 22,
+        timeText: "約20〜30分",
+        footing: "堤防は完全フラット。外側地磯は海抜が低い平磯（海苔があるためフェルトスパイク推奨）。",
+        footingLevel: 3.8,
+        kagoFit: 4.0,
+        kagoDesc: "沖合80mの沖根（離れ島）手前のスリットへ70〜80m超遠投で良型マダイ・青物が直撃。",
+        egingFit: 5.0,
+        egingDesc: "水深3〜5mの遠浅シャローにホンダワラが群生。エギング実績は島内屈指。",
+        targets: ["マダイ", "アオリイカ", "クロダイ", "イナダ/青物", "メジナ"],
+        isWindShelter: false,
+        shelterNote: "西〜北西風を受けやすいオープンエリア",
+        desc: "七浦海岸の一級ポイント。堤防部分をベースに外側の岩場へ広がれるため、初心者でも堤防寄りから始めやすい。遠投カゴとエギングの二刀流が最も映える名所。",
+        safetyNote: "岩盤の海苔で滑りやすいため、フェルトスパイクシューズの着用をおすすめします。"
+      },
+      {
+        id: 4,
+        name: "相川下戸周辺の岩礁帯",
+        reading: "あいかわおりと",
+        type: "hiraiso",
+        typeName: "砂地・岩礁混在平磯",
+        categoryColor: "text-emerald-400",
+        badgeColor: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
+        pinColor: "#10b981",
+        distanceKm: 9,
+        timeMin: 15,
+        timeText: "約15分",
+        footing: "砂浜と平坦な岩盤が隣接し足場安定。選べば初心者でも安全にエントリー可能。",
+        footingLevel: 4.5,
+        kagoFit: 3.0,
+        kagoDesc: "水深が浅めのため遠投カゴやライトカゴ、投げ釣りに好適。クロダイ・キス狙い。",
+        egingFit: 4.2,
+        egingDesc: "砂地に点在するシモリ（沈み根）周りでイカが捕食。秋の数釣りに最適。",
+        targets: ["クロダイ", "メジナ", "アオリイカ", "メバル", "シロギス"],
+        isWindShelter: false,
+        shelterNote: "相川湾内寄りで比較的穏やか",
+        desc: "相川市街からすぐの優しいポイント。砂地と岩礁が混在し、エギングに加えキスの投げ釣りやライトカゴ釣りが手軽に成立します。",
+        safetyNote: "遠浅のため干潮時は根掛かりに留意し、少し潮位のある時間帯が釣りやすいです。"
+      },
+      {
+        id: 5,
+        name: "相川港・周辺堤防",
+        reading: "あいかわこう",
+        type: "pier",
+        typeName: "安全堤防・大型港湾",
+        categoryColor: "text-sky-400",
+        badgeColor: "bg-sky-500/20 text-sky-300 border-sky-500/40",
+        pinColor: "#0284c7",
+        distanceKm: 10,
+        timeMin: 15,
+        timeText: "約15分",
+        footing: "コンクリート舗装の完全フラット。夜釣りでも安心感抜群。",
+        footingLevel: 5.0,
+        kagoFit: 4.5,
+        kagoDesc: "堤防先端・外向きは水深十分。足元〜中距離のカゴ釣りで良型青物・マダイ・アジ。",
+        egingFit: 4.5,
+        egingDesc: "墨跡多数。常夜灯周辺のナイトエギングや堤防際のシェード狙いが堅実。",
+        targets: ["マダイ", "クロダイ", "アジ", "アオリイカ", "ヒラマサ/青物"],
+        isWindShelter: false,
+        shelterNote: "湾内は波穏やかだが外向きは北西風の影響あり",
+        desc: "足場フラットで安心の大型港湾。水深がしっかりあり、潮通しも良いためカゴ釣り・サビキ・エギングが快適に両立します。",
+        safetyNote: "港湾関係者の作業エリアや立入禁止フェンス内への進入は避け、マナーを守って釣行しましょう。"
+      },
+      {
+        id: 6,
+        name: "佐和田・沢根周辺の港・堤防",
+        reading: "さわだ / さわね",
+        type: "pier",
+        typeName: "安全堤防・内湾港湾（風裏）",
+        categoryColor: "text-sky-400",
+        badgeColor: "bg-sky-500/20 text-sky-300 border-sky-500/40",
+        pinColor: "#0284c7",
+        distanceKm: 4,
+        timeMin: 8,
+        timeText: "約5〜15分（超近場）",
+        footing: "完全平坦。車を近くに停められる場所もあり最高レベルの安全性。",
+        footingLevel: 5.0,
+        kagoFit: 3.5,
+        kagoDesc: "クロダイやアジ、サヨリ狙いのカゴ釣り・遠投サビキに好適。",
+        egingFit: 4.2,
+        egingDesc: "真野湾奥の穏やかな海。常夜灯があれば夜エギングも有利で秋イカが手堅い。",
+        targets: ["アジ", "アオリイカ", "クロダイ", "メバル", "サヨリ"],
+        isWindShelter: true,
+        shelterNote: "真野湾奥：北〜北北西風を陸地がブロック",
+        desc: "ヴィンセントから車で5〜15分の超近場。真野湾奥に位置するため北寄りの風に強く、朝夕マズメの短時間釣行やナイトエギングに絶好の拠点です。",
+        safetyNote: "係留船周辺での仕掛け引っ掛けに配慮し、ライフジャケットを着用して楽しみましょう。"
+      },
+      {
+        id: 7,
+        name: "真野湾（国府川河口付近の堤防）",
+        reading: "まのわんていぼう",
+        type: "pier",
+        typeName: "安全堤防・河口導流堤（準風裏）",
+        categoryColor: "text-sky-400",
+        badgeColor: "bg-sky-500/20 text-sky-300 border-sky-500/40",
+        pinColor: "#0284c7",
+        distanceKm: 7,
+        timeMin: 12,
+        timeText: "約10〜20分",
+        footing: "平坦で歩きやすい河口突堤。サーフ要素も少しありルアー・カゴ向き。",
+        footingLevel: 4.8,
+        kagoFit: 3.5,
+        kagoDesc: "潮目に向かって遠投カゴで青物・クロダイ、投げ仕掛けでキスやフラットフィッシュ。",
+        egingFit: 3.5,
+        egingDesc: "河口直近の真水を避け、堤防外側の潮が澄んだブレイクラインや岩混じりエリアで狙う。",
+        targets: ["ヒラメ", "マゴチ", "シーバス", "青物", "シロギス"],
+        isWindShelter: true,
+        shelterNote: "真野湾内：北風に対して波立ちが少ない",
+        desc: "国府川から供給されるベイトを求めて青物やヒラメ、シーバスが集結。平坦でルアーや遠投カゴに向き、近くの岩混じりポイントと組み合わせやすい好立地です。",
+        safetyNote: "大雨直後の増水・濁り時は河口から少し離れた堤防を選ぶと釣果が安定します。"
+      },
+      {
+        id: 8,
+        name: "平根崎",
+        reading: "ひらねざき",
+        type: "heavy",
+        typeName: "本格外洋磯（天然記念物甌穴群）",
+        categoryColor: "text-amber-400",
+        badgeColor: "bg-amber-500/20 text-amber-300 border-amber-500/40",
+        pinColor: "#f59e0b",
+        distanceKm: 22,
+        timeMin: 35,
+        timeText: "約35分",
+        footing: "巨大な平坦岩盤だが傾斜や甌穴（波蝕穴）があり、海面スレスレで這い上がり波に注意。",
+        footingLevel: 2.5,
+        kagoFit: 5.0,
+        kagoDesc: "平坦な足元から外海の本流が直接かすめる。超大型マダイ・ヒラマサ・ブリを直撃可能。",
+        egingFit: 3.8,
+        egingDesc: "潮流が速いためエギの沈下管理が鍵。潮の緩むヨレやワンドに大型アオリイカが潜む。",
+        targets: ["ヒラマサ", "ブリ/ワラサ", "大型マダイ", "クロダイ", "アオリイカ"],
+        isWindShelter: false,
+        shelterNote: "外洋直撃エリア（波浪・うねり影響大）",
+        desc: "約500mにわたり広大な平根が連なる超一級外洋磯。カゴ釣りでの大鯛・青物ポテンシャルは島内最強クラス。外洋うねりを直接受けるため凪の日限定の特級ポイントです。",
+        safetyNote: "波高1.5m以上やうねり進入時は立ち入りを控え、スパイクシューズ・浮力ベストを必ず着用しましょう。"
+      },
+      {
+        id: 9,
+        name: "千畳敷",
+        reading: "せんじょうじき",
+        type: "hiraiso",
+        typeName: "平磯・広大波食棚",
+        categoryColor: "text-emerald-400",
+        badgeColor: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
+        pinColor: "#10b981",
+        distanceKm: 14,
+        timeMin: 25,
+        timeText: "約25分",
+        footing: "駐車場から階段で直行できる広大な平坦岩盤。歩きやすくエントリー容易。",
+        footingLevel: 4.0,
+        kagoFit: 5.0,
+        kagoDesc: "平磯ながら沖合すぐに深場へのドロップオフ（落ち込み）があり、中距離遠投カゴでマダイ連発。",
+        egingFit: 5.0,
+        egingDesc: "足元の海藻帯と沖のスリットにイカが密集。秋エギングの超高実績ポイント。",
+        targets: ["マダイ", "クロダイ", "アオリイカ", "イナダ", "キジハタ"],
+        isWindShelter: false,
+        shelterNote: "西向きオープンエリア",
+        desc: "「平磯の歩きやすさ」と「外海急深の潮通し」が同居したハイブリッド磯。カゴ釣りとエギングを同時に同一釣り座で成立させたい場合の最有力候補です。",
+        safetyNote: "満潮時やうねりが入ると岩盤上に波が這い上がりやすいため、潮見表（タイドグラフ）を確認しておきましょう。"
+      },
+      {
+        id: 10,
+        name: "強清水（小木強清水）",
+        reading: "こわしみず",
+        type: "heavy",
+        typeName: "本格外洋磯・隆起波食台（南岸風裏）",
+        categoryColor: "text-amber-400",
+        badgeColor: "bg-amber-500/20 text-amber-300 border-amber-500/40",
+        pinColor: "#f59e0b",
+        distanceKm: 40,
+        timeMin: 48,
+        timeText: "約45〜50分",
+        footing: "小木半島南岸の平坦な棚状岩盤。清水荘下からアプローチでき、歩行安定。",
+        footingLevel: 3.9,
+        kagoFit: 4.8,
+        kagoDesc: "外海本流の分流が抜け、40〜60mのキャストで沖の潮目を直撃。良型マダイ・青物・黒鯛。",
+        egingFit: 5.0,
+        egingDesc: "水面直下に広がる広大な波食台のスリット・ホンダワラ帯にアオリイカが密集。",
+        targets: ["マダイ", "ヒラマサ/青物", "アオリイカ", "クロダイ", "メジナ"],
+        isWindShelter: true,
+        shelterNote: "北寄り風裏（外洋西寄りうねりの回り込みに配慮）",
+        desc: "佐渡南端の好ポイント。背後の小木半島台地が北寄りの季節風を遮るため、西海岸が風波立つ日でも水面が落ち着きやすいエリア。外海からのうねり予報（波高1.5m以内目安）を事前に確認して釣行するのがおすすめです。",
+        safetyNote: "南向き平磯のため、外洋の西〜南西うねりがある日は這い上がり波に注意し、直前の海況予報を確認しましょう。"
+      }
+    ];
+
+    let currentFilter = "all";
+    let currentSort = "id";
+    let selectedSpotId = 1;
+    let selectedSubCode = "1A";
+
+    const spotCardsContainer = document.getElementById("spotCardsContainer");
+    const mobileBottomSheet = document.getElementById("mobileBottomSheet");
+    const bottomSheetBackdrop = document.getElementById("bottomSheetBackdrop");
+    const bottomSheetContent = document.getElementById("bottomSheetContent");
+    const tableBody = document.getElementById("tableBody");
+    const filterButtons = document.querySelectorAll(".filter-btn");
+    const sortSelect = document.getElementById("sortSelect");
+    const btnSwitchView = document.getElementById("btnSwitchView");
+    const viewModeText = document.getElementById("viewModeText");
+    const interactiveContainer = document.getElementById("interactiveContainer");
+    const tableViewContainer = document.getElementById("tableViewContainer");
+    const btnBackToMap = document.getElementById("btnBackToMap");
+    const btnExportSVG = document.getElementById("btnExportSVG");
+
+    // 地図ズーム切り替え機能
+    function setMapZoom(scale) {
+      const wrapper = document.getElementById("mapZoomWrapper");
+      if (!wrapper) return;
+      wrapper.style.width = `${Math.round(scale * 100)}%`;
+
+      const buttons = [
+        { id: "zoomBtn1", val: 1 },
+        { id: "zoomBtn135", val: 1.35 },
+        { id: "zoomBtn170", val: 1.7 }
+      ];
+      buttons.forEach(btn => {
+        const el = document.getElementById(btn.id);
+        if (!el) return;
+        if (Math.abs(btn.val - scale) < 0.05) {
+          el.className = "px-2.5 py-1 rounded-lg text-xs sm:text-sm font-black bg-cyan-500 text-slate-950 transition";
+        } else {
+          el.className = "px-2.5 py-1 rounded-lg text-xs sm:text-sm font-bold bg-slate-800 text-slate-200 hover:bg-slate-700 transition";
+        }
+      });
+    }
+
+    function renderStars(rating) {
+      const full = Math.floor(rating);
+      const half = rating % 1 >= 0.5;
+      let stars = "";
+      for (let i = 0; i < full; i++) stars += "★";
+      if (half) stars += "½";
+      return stars;
+    }
+
+    /*
+     * 重要バグ防止関数:
+     * ポップアップを×で閉じた際やピン切り替え時に、すべてのピン円(.pin-circle)と番号テキスト(.pin-number)が
+     * 100%確実に表示状態・白色テキストで残るよう強制復元します。
+     */
+    function restoreAllPinNumbers() {
+      document.querySelectorAll(".spot-pin-group").forEach(pinGroup => {
+        pinGroup.style.opacity = "1";
+        pinGroup.style.visibility = "visible";
+        pinGroup.style.display = "block";
+
+        const circle = pinGroup.querySelector(".pin-circle");
+        if (circle) {
+          circle.style.opacity = "1";
+          circle.style.visibility = "visible";
+          circle.style.display = "block";
+        }
+
+        const numText = pinGroup.querySelector(".pin-number");
+        if (numText) {
+          const originalLabel = numText.getAttribute("data-label");
+          if (originalLabel && numText.textContent !== originalLabel) {
+            numText.textContent = originalLabel;
+          }
+          numText.setAttribute("fill", "#ffffff");
+          numText.style.fill = "#ffffff";
+          numText.style.opacity = "1";
+          numText.style.visibility = "visible";
+          numText.style.display = "block";
+        }
+      });
+    }
+
+    function openBottomSheet(spot, subCode) {
+      if (!spot) return;
+
+      let subSpotsHtml = "";
+      if (spot.subSpots && spot.subSpots.length > 0) {
+        subSpotsHtml = `
+          <div class="bg-slate-950/90 p-3.5 rounded-2xl border border-sky-500/40 space-y-2.5">
+            <div class="text-sm sm:text-base font-black text-sky-300 flex items-center gap-1.5">
+              <span>🛡️ 東海岸・完全風裏の4拠点（クリックでマップ位置確認）</span>
+            </div>
+            <div class="space-y-2">
+              ${spot.subSpots.map(sub => {
+                const isSubActive = subCode === sub.code;
+                return `
+                  <div class="p-3 rounded-xl border transition ${isSubActive ? 'bg-sky-950/70 border-sky-400 ring-1 ring-sky-400' : 'bg-slate-900/90 border-slate-800'}">
+                    <div class="flex items-center justify-between gap-2 flex-wrap">
+                      <span class="font-black text-sm sm:text-base text-white">${sub.title}</span>
+                      <span class="text-xs sm:text-sm font-bold text-amber-300">${sub.access}</span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-200 mt-1 leading-relaxed">${sub.feature}</p>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      bottomSheetContent.innerHTML = `
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex items-center gap-3 min-w-0">
+            <span class="w-11 h-11 rounded-full bg-slate-950 border-2 border-cyan-400 ${spot.categoryColor} font-black text-lg flex items-center justify-center shrink-0 shadow-md">
+              ${subCode ? subCode : spot.id}
+            </span>
+            <div class="min-w-0">
+              <h3 class="font-black text-lg sm:text-xl text-white leading-snug break-words">
+                ${spot.name}
+              </h3>
+              <p class="text-xs sm:text-sm text-slate-300 mt-0.5">${spot.reading}</p>
+              <div class="flex flex-wrap items-center gap-2 mt-1.5">
+                <span class="px-2.5 py-0.5 rounded-lg text-xs sm:text-sm font-bold border ${spot.badgeColor}">
+                  ${spot.typeName}
+                </span>
+                ${spot.isWindShelter ? `<span class="px-2.5 py-0.5 rounded-lg text-xs sm:text-sm bg-sky-950 text-sky-300 border border-sky-500/50 font-black">${spot.id === 10 ? '南岸風裏 / うねり要確認' : '風裏・穏やか'}</span>` : ''}
+              </div>
+            </div>
+          </div>
+          <button type="button" onclick="closeBottomSheet()" class="w-11 h-11 rounded-full bg-slate-800 hover:bg-slate-700 text-white border border-slate-600 flex items-center justify-center shrink-0 transition active:scale-95 shadow-md" aria-label="閉じる">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-950/90 px-4 py-3 rounded-xl border border-slate-800 text-sm sm:text-base">
+          <div class="flex items-center gap-2">
+            <span class="text-slate-300 font-bold">ヴィンセント発:</span>
+            <span class="font-black text-amber-300">${spot.timeText}</span>
+          </div>
+          <div class="text-slate-200 font-bold">
+            足場評価: <span class="text-cyan-300 font-black">★ ${spot.footingLevel} / 5.0</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm sm:text-base bg-slate-950/60 p-3.5 rounded-xl border border-slate-800">
+          <div>
+            <span class="text-slate-300 text-xs sm:text-sm font-bold block">カゴ釣り適性: <span class="text-amber-400 font-black">${renderStars(spot.kagoFit)}</span></span>
+            <p class="text-xs sm:text-sm text-slate-200 mt-1 leading-relaxed">${spot.kagoDesc}</p>
+          </div>
+          <div>
+            <span class="text-slate-300 text-xs sm:text-sm font-bold block">エギング適性: <span class="text-emerald-400 font-black">${renderStars(spot.egingFit)}</span></span>
+            <p class="text-xs sm:text-sm text-slate-200 mt-1 leading-relaxed">${spot.egingDesc}</p>
+          </div>
+        </div>
+
+        ${subSpotsHtml}
+
+        <div class="flex flex-wrap items-center gap-1.5 py-1">
+          <span class="text-slate-300 text-xs sm:text-sm font-bold shrink-0">秋ターゲット:</span>
+          ${spot.targets.map(t => `<span class="px-2.5 py-1 rounded-lg text-xs sm:text-sm bg-slate-800 text-white border border-slate-700 font-bold">${t}</span>`).join('')}
+        </div>
+
+        <div class="pt-1 flex items-center gap-3">
+          <button type="button" onclick="scrollToSpotDetail(${spot.id})" class="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-sky-400 text-slate-950 text-sm sm:text-base font-black flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 active:scale-95 transition">
+            <span>カード一覧の解説へ移動</span>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+          </button>
+          <button type="button" onclick="closeBottomSheet()" class="py-3 px-5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-sm sm:text-base font-bold active:scale-95 transition">
+            閉じる
+          </button>
+        </div>
+      `;
+
+      bottomSheetBackdrop.classList.remove("opacity-0", "pointer-events-none");
+      bottomSheetBackdrop.classList.add("opacity-100", "pointer-events-auto");
+      mobileBottomSheet.classList.remove("translate-y-full");
+      mobileBottomSheet.classList.add("translate-y-0");
+
+      // ポップアップ表示中もピン番号を確実に維持
+      restoreAllPinNumbers();
+    }
+
+    function closeBottomSheet() {
+      bottomSheetBackdrop.classList.remove("opacity-100", "pointer-events-auto");
+      bottomSheetBackdrop.classList.add("opacity-0", "pointer-events-none");
+      mobileBottomSheet.classList.remove("translate-y-0");
+      mobileBottomSheet.classList.add("translate-y-full");
+
+      // ポップアップを×で閉じた後、選択されたピン番号を含め全ピンの番号を確実に再表示・保持
+      updateMapPins();
+      restoreAllPinNumbers();
+    }
+
+    function scrollToSpotDetail(id) {
+      closeBottomSheet();
+      setTimeout(() => {
+        const targetCard = document.getElementById(`card-${id}`);
+        if (targetCard) {
+          targetCard.scrollIntoView({ behavior: "smooth", block: "start" });
+          targetCard.classList.add("card-highlight");
+          setTimeout(() => targetCard.classList.remove("card-highlight"), 3500);
+        }
+        restoreAllPinNumbers();
+      }, 220);
+    }
+
+    function handlePinInteraction(id, subCode = null) {
+      selectedSpotId = id;
+      selectedSubCode = subCode || (id === 1 ? "1A" : null);
+      const spot = spotsData.find(s => s.id === id);
+
+      updateMapPins();
+      restoreAllPinNumbers();
+
+      document.querySelectorAll(".spot-card").forEach(card => {
+        card.classList.remove("bg-slate-800/95", "border-cyan-400", "shadow-xl", "shadow-cyan-950/80", "ring-2", "ring-cyan-400", "card-highlight");
+        card.classList.add("bg-slate-900/90", "border-slate-800");
+      });
+      const targetCard = document.getElementById(`card-${id}`);
+      if (targetCard) {
+        targetCard.classList.remove("bg-slate-900/90", "border-slate-800");
+        targetCard.classList.add("bg-slate-800/95", "border-cyan-400", "shadow-xl", "shadow-cyan-950/80", "ring-2", "ring-cyan-400", "card-highlight");
+      }
+
+      // モバイル・タブレット（またはマップピン直タップ時）はわかりやすいポップアップシートを表示
+      if (window.innerWidth < 1280 || subCode !== null) {
+        openBottomSheet(spot, selectedSubCode);
+      } else if (targetCard) {
+        targetCard.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    }
+
+    function selectSpot(id, subCode = null) {
+      selectedSpotId = id;
+      selectedSubCode = subCode || (id === 1 ? "1A" : null);
+      updateMapPins();
+      restoreAllPinNumbers();
+
+      document.querySelectorAll(".spot-card").forEach(card => {
+        card.classList.remove("bg-slate-800/95", "border-cyan-400", "shadow-xl", "shadow-cyan-950/80", "ring-2", "ring-cyan-400", "card-highlight");
+        card.classList.add("bg-slate-900/90", "border-slate-800");
+      });
+      const targetCard = document.getElementById(`card-${id}`);
+      if (targetCard) {
+        targetCard.classList.remove("bg-slate-900/90", "border-slate-800");
+        targetCard.classList.add("bg-slate-800/95", "border-cyan-400", "shadow-xl", "shadow-cyan-950/80", "ring-2", "ring-cyan-400", "card-highlight");
+      }
+    }
+
+    function renderSpots() {
+      let filtered = spotsData.filter(spot => {
+        if (currentFilter === "all") return true;
+        if (currentFilter === "hiraiso") return spot.type === "hiraiso";
+        if (currentFilter === "pier") return spot.type === "pier";
+        if (currentFilter === "heavy") return spot.type === "heavy";
+        if (currentFilter === "shelter") return spot.isWindShelter === true;
+        return true;
+      });
+
+      filtered.sort((a, b) => {
+        if (currentSort === "time-asc") return a.timeMin - b.timeMin;
+        if (currentSort === "time-desc") return b.timeMin - a.timeMin;
+        if (currentSort === "safety") return b.footingLevel - a.footingLevel;
+        if (currentSort === "id") return a.id - b.id;
+        return 0;
+      });
+
+      spotCardsContainer.innerHTML = filtered.map(spot => {
+        const isSelected = spot.id === selectedSpotId;
+        const subSpotsBlock = spot.subSpots ? `
+          <div class="mt-3 p-3.5 rounded-xl bg-slate-950/90 border border-sky-500/40 space-y-2.5">
+            <div class="text-sm sm:text-base font-black text-sky-300">
+              🛡️ 東海岸・完全風裏の4拠点（タップで地図ピンをフォーカス）
+            </div>
+            <div class="space-y-2">
+              ${spot.subSpots.map(sub => `
+                <div onclick="event.stopPropagation(); handlePinInteraction(1, '${sub.code}')" class="p-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 cursor-pointer transition">
+                  <div class="flex items-center justify-between gap-2 flex-wrap">
+                    <span class="font-black text-sm sm:text-base text-cyan-300">${sub.title}</span>
+                    <span class="text-xs sm:text-sm font-bold text-amber-300">${sub.access}</span>
+                  </div>
+                  <p class="text-xs sm:text-sm text-slate-200 mt-1 leading-relaxed">${sub.feature}</p>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : '';
+
+        return `
+          <div id="card-${spot.id}" onclick="selectSpot(${spot.id})" class="spot-card p-4 sm:p-5 rounded-2xl border transition-all duration-200 cursor-pointer ${
+            isSelected 
+              ? "bg-slate-800/95 border-cyan-400 shadow-xl shadow-cyan-950/80 ring-2 ring-cyan-400 card-highlight" 
+              : "bg-slate-900/90 border-slate-800 hover:border-slate-700"
+          }">
+            <div class="flex items-start justify-between gap-3 mb-3">
+              <div class="flex items-center gap-3">
+                <span class="w-9 h-9 rounded-full bg-slate-950 border-2 border-slate-700 ${spot.categoryColor} font-black text-base flex items-center justify-center shrink-0 shadow-sm">
+                  ${spot.id}
+                </span>
+                <div>
+                  <h3 class="font-black text-lg sm:text-xl text-white flex items-center gap-2 flex-wrap leading-snug">
+                    ${spot.name}
+                    ${spot.isWindShelter ? `<span class="text-xs sm:text-sm bg-sky-950 text-sky-300 border border-sky-500/50 px-2.5 py-0.5 rounded-lg font-black">${spot.id === 10 ? '南岸風裏 / うねり要確認' : '完全風裏・穏やか'}</span>` : ''}
+                  </h3>
+                  <p class="text-xs sm:text-sm text-slate-300 mt-0.5">${spot.reading} ｜ <span class="${spot.categoryColor} font-bold">${spot.typeName}</span></p>
+                </div>
+              </div>
+              <div class="text-right shrink-0">
+                <span class="text-sm sm:text-base font-black text-amber-300 block">${spot.timeText}</span>
+                <span class="block text-xs sm:text-sm text-slate-300">拠点から約${spot.distanceKm}km</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 my-3 p-3 rounded-xl bg-slate-950/75 border border-slate-800 text-sm">
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-slate-300 font-bold">カゴ釣り適性:</span>
+                  <span class="text-amber-400 font-black">${renderStars(spot.kagoFit)}</span>
+                </div>
+                <p class="text-xs sm:text-sm text-slate-300 leading-snug">${spot.kagoDesc}</p>
+              </div>
+              <div class="pt-2 sm:pt-0 border-t sm:border-t-0 sm:border-l border-slate-800 sm:pl-3">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-slate-300 font-bold">エギング適性:</span>
+                  <span class="text-emerald-400 font-black">${renderStars(spot.egingFit)}</span>
+                </div>
+                <p class="text-xs sm:text-sm text-slate-300 leading-snug">${spot.egingDesc}</p>
+              </div>
+            </div>
+
+            <p class="text-sm sm:text-base text-slate-200 leading-relaxed mb-3">${spot.desc}</p>
+
+            ${subSpotsBlock}
+
+            <div class="flex flex-wrap gap-1.5 my-3">
+              ${spot.targets.map(t => `<span class="px-2.5 py-1 rounded-lg text-xs sm:text-sm bg-slate-800 text-slate-100 border border-slate-700 font-bold">${t}</span>`).join('')}
+            </div>
+
+            <div class="text-xs sm:text-sm pt-2.5 border-t border-slate-800 flex items-start gap-2 text-slate-300">
+              <span class="shrink-0 text-cyan-300 font-black">足場特徴:</span>
+              <span>${spot.footing}</span>
+            </div>
+            ${spot.safetyNote ? `
+              <div class="mt-2 text-xs sm:text-sm text-amber-300 flex items-start gap-1.5 font-bold leading-relaxed">
+                <span class="shrink-0">💡</span>
+                <span>${spot.safetyNote}</span>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+
+      tableBody.innerHTML = filtered.map(spot => `
+        <tr class="hover:bg-slate-800/50 transition">
+          <td class="p-3.5 font-black text-center text-lg ${spot.categoryColor}">${spot.id}</td>
+          <td class="p-3.5">
+            <div class="font-black text-white text-base">${spot.name}</div>
+            <div class="text-xs sm:text-sm text-slate-300">${spot.reading}</div>
+          </td>
+          <td class="p-3.5">
+            <span class="px-2.5 py-1 rounded-lg border text-xs sm:text-sm font-bold ${spot.badgeColor}">
+              ${spot.typeName}
+            </span>
+          </td>
+          <td class="p-3.5">
+            <div class="font-black text-amber-300 text-base">${spot.timeText}</div>
+            <div class="text-slate-300 text-xs sm:text-sm">約${spot.distanceKm}km</div>
+          </td>
+          <td class="p-3.5">
+            <div class="flex text-amber-400 text-sm sm:text-base font-black">${renderStars(spot.kagoFit)}</div>
+            <div class="text-xs sm:text-sm text-slate-300 mt-1">${spot.kagoDesc}</div>
+          </td>
+          <td class="p-3.5">
+            <div class="flex text-emerald-400 text-sm sm:text-base font-black">${renderStars(spot.egingFit)}</div>
+            <div class="text-xs sm:text-sm text-slate-300 mt-1">${spot.egingDesc}</div>
+          </td>
+          <td class="p-3.5">
+            <div class="font-black text-white">★ ${spot.footingLevel}/5.0</div>
+            <div class="text-xs sm:text-sm text-slate-300 mt-0.5">${spot.footing}</div>
+          </td>
+          <td class="p-3.5">
+            <div class="flex flex-wrap gap-1.5">
+              ${spot.targets.map(t => `<span class="bg-slate-800 text-white px-2 py-0.5 rounded-lg text-xs sm:text-sm font-bold">${t}</span>`).join('')}
+            </div>
+          </td>
+          <td class="p-3.5 text-slate-200 leading-relaxed min-w-[260px]">
+            <div class="text-sm sm:text-base">${spot.desc}</div>
+            ${spot.safetyNote ? `<div class="text-amber-300 text-xs sm:text-sm mt-1.5 font-bold">💡 ${spot.safetyNote}</div>` : ''}
+          </td>
+        </tr>
+      `).join('');
+
+      updateMapPins();
+      restoreAllPinNumbers();
+    }
+
+    function updateMapPins() {
+      document.querySelectorAll(".spot-pin-group").forEach(pin => {
+        const pinSpotId = parseInt(pin.getAttribute("data-spot-id"), 10);
+        const pinSubId = pin.getAttribute("data-sub-id");
+        const isMatch = (pinSpotId === selectedSpotId) && (!pinSubId || !selectedSubCode || pinSubId === selectedSubCode || selectedSpotId === 1);
+
+        if (isMatch) {
+          pin.classList.add("pin-selected");
+        } else {
+          pin.classList.remove("pin-selected");
+        }
+      });
+      restoreAllPinNumbers();
+    }
+
+    filterButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        filterButtons.forEach(b => {
+          b.classList.remove("active", "bg-cyan-500", "text-slate-950", "font-black");
+          b.classList.add("bg-slate-800", "text-slate-200");
+        });
+        btn.classList.add("active", "bg-cyan-500", "text-slate-950", "font-black");
+        btn.classList.remove("bg-slate-800", "text-slate-200");
+        currentFilter = btn.dataset.filter;
+        renderSpots();
+      });
+    });
+
+    sortSelect.addEventListener("change", (e) => {
+      currentSort = e.target.value;
+      renderSpots();
+    });
+
+    function toggleViewMode() {
+      const isTableHidden = tableViewContainer.classList.contains("hidden");
+      if (isTableHidden) {
+        tableViewContainer.classList.remove("hidden");
+        interactiveContainer.classList.add("hidden");
+        viewModeText.textContent = "マップ表示に戻る";
+      } else {
+        tableViewContainer.classList.add("hidden");
+        interactiveContainer.classList.remove("hidden");
+        viewModeText.textContent = "一覧表で比較";
+        restoreAllPinNumbers();
+      }
+    }
+    btnSwitchView.addEventListener("click", toggleViewMode);
+    btnBackToMap.addEventListener("click", toggleViewMode);
+
+    btnExportSVG.addEventListener("click", () => {
+      restoreAllPinNumbers();
+      const svgElement = document.getElementById("sadoMapSvg");
+      const serializer = new XMLSerializer();
+      let source = serializer.serializeToString(svgElement);
+
+      if(!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)){
+        source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+      }
+
+      const svgBlob = new Blob([source], {type: "image/svg+xml;charset=utf-8"});
+      const svgUrl = URL.createObjectURL(svgBlob);
+      const downloadLink = document.createElement("a");
+      downloadLink.href = svgUrl;
+      downloadLink.download = "sado_fishing_map.svg";
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+      URL.revokeObjectURL(svgUrl);
+    });
+
+    window.addEventListener("DOMContentLoaded", () => {
+      renderSpots();
+      restoreAllPinNumbers();
+    });
+  </script>
+</body>
+</html>
+```
