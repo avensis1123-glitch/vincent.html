@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>佐渡島 厳選15釣り場ダッシュボード｜ヴィンセント起点</title>
+<title>佐渡島 厳選15釣り場ダッシュボード｜最終統合版・ヴィンセント起点</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700;900&display=swap" rel="stylesheet">
@@ -89,12 +89,13 @@
         <button data-filter="all" class="rounded-lg border px-2.5 py-1.5 font-bold bg-sky-600 text-white">すべて (15)</button>
         <button data-filter="shelter" class="rounded-lg border px-2.5 py-1.5 bg-white hover:bg-slate-50">北西風の風裏候補 (7)</button>
         <button data-filter="hiraiso" class="rounded-lg border px-2.5 py-1.5 bg-white hover:bg-slate-50">平磯・低磯 (6)</button>
-        <button data-filter="pier" class="rounded-lg border px-2.5 py-1.5 bg-white hover:bg-slate-50">港・護岸・河口 (6)</button>
+        <button data-filter="pier" class="rounded-lg border px-2.5 py-1.5 bg-white hover:bg-slate-50">港・護岸 (5)</button>
         <button data-filter="heavy" class="rounded-lg border px-2.5 py-1.5 bg-white hover:bg-slate-50">外洋地磯 (3)</button>
+        <button data-filter="surf" class="rounded-lg border px-2.5 py-1.5 bg-white hover:bg-slate-50">サーフ (1)</button>
       </div>
       <label class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-xs font-bold text-amber-900 cursor-pointer">
         <input type="checkbox" id="excludeUnverified" class="rounded text-sky-600">
-        釣り座未確定の港・岬(※)を除外
+        現地確認メモ付きの地点を除外
       </label>
     </div>
     <label class="text-xs sm:text-sm font-bold flex items-center gap-1.5">並び順
@@ -117,8 +118,6 @@
         <div class="flex flex-wrap gap-1 text-xs sm:text-sm">
           <button class="zoom border rounded px-2.5 py-1 bg-sky-100 font-bold" data-zoom="fit">全体(縮小)</button>
           <button class="zoom border rounded px-2.5 py-1" data-zoom="1">標準</button>
-          <button class="zoom border rounded px-2.5 py-1" data-zoom="1.35">1.35×</button>
-          <button class="zoom border rounded px-2.5 py-1" data-zoom="1.75">1.75×</button>
         </div>
       </div>
 
@@ -163,21 +162,22 @@
               <text y="-33" text-anchor="middle" font-size="17" font-weight="900" fill="#dc2626">N</text>
             </g>
             <g id="pinLayer"></g>
-            <g transform="translate(140 848)">
-              <rect width="860" height="56" rx="12" fill="white" stroke="#94a3b8" stroke-width="1.5"/>
-              <circle cx="28" cy="28" r="10.5" fill="#0284c7"/><text x="46" y="34" font-size="17" font-weight="800" fill="#172334">港・護岸・河口</text>
-              <circle cx="205" cy="28" r="10.5" fill="#059669"/><text x="223" y="34" font-size="17" font-weight="800" fill="#172334">平磯・低磯</text>
-              <circle cx="350" cy="28" r="10.5" fill="#d97706"/><text x="368" y="34" font-size="17" font-weight="800" fill="#172334">外洋地磯</text>
-              <circle cx="482" cy="28" r="10.5" fill="#dc2626"/><text x="500" y="34" font-size="17" font-weight="800" fill="#172334">拠点：ヴィンセント</text>
-              <line x1="680" y1="28" x2="718" y2="28" stroke="#d97706" stroke-width="2.8" stroke-dasharray="4 4"/>
-              <text x="726" y="34" font-size="16" font-weight="800" fill="#475569">主要道路の概略</text>
+            <g transform="translate(116 848)">
+              <rect width="925" height="56" rx="12" fill="white" stroke="#94a3b8" stroke-width="1.5"/>
+              <circle cx="28" cy="28" r="10" fill="#0284c7"/><text x="45" y="34" font-size="16" font-weight="800" fill="#172334">港・護岸</text>
+              <circle cx="177" cy="28" r="10" fill="#059669"/><text x="194" y="34" font-size="16" font-weight="800" fill="#172334">平磯・低磯</text>
+              <circle cx="326" cy="28" r="10" fill="#d97706"/><text x="343" y="34" font-size="16" font-weight="800" fill="#172334">外洋地磯</text>
+              <circle cx="470" cy="28" r="10" fill="#7c3aed"/><text x="487" y="34" font-size="16" font-weight="800" fill="#172334">サーフ</text>
+              <circle cx="579" cy="28" r="10" fill="#dc2626"/><text x="596" y="34" font-size="16" font-weight="800" fill="#172334">拠点：ヴィンセント</text>
+              <line x1="799" y1="28" x2="832" y2="28" stroke="#d97706" stroke-width="2.8" stroke-dasharray="4 4"/>
+              <text x="838" y="34" font-size="15" font-weight="800" fill="#475569">道路</text>
             </g>
           </svg>
         </div>
       </div>
 
       <p class="text-xs text-slate-600 mt-2.5 leading-relaxed">
-        ※地点間の図上距離や位置関係は実際の縮尺・距離と比例しません。正確な位置と実際の道路距離は各カードのGoogleマップ連携ボタンで確認してください。
+        ※この地図は模式図です。⑥護岸と⑦サーフの位置も概略表示であり、地点間の図上距離や位置関係は実際の縮尺・距離と比例しません。正確な位置と実際の道路距離は各カードのGoogleマップ連携ボタンで確認してください。
       </p>
       <div class="mt-3 space-y-2 text-xs sm:text-sm leading-relaxed">
         <div class="bg-sky-50 border border-sky-200 rounded-xl px-3 py-2.5 text-sky-950">
@@ -189,9 +189,9 @@
             <strong>【重要】⑤ 姫津漁港（西防波堤）の期間・まき餌規制：</strong><br>
             開放期間は<strong>5月1日〜10月31日の10:00〜16:00限定</strong>です（<strong>11月1日は期間外閉鎖</strong>・荒天時閉鎖あり）。また『佐渡フィッシングガイド』によると<strong>「オキアミ以外のまき餌は禁止」</strong>されています。
           </div>
-          <div class="text-rose-950 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">
-            <strong>【重要】港湾・漁港施設の立入制限について：</strong><br>
-            県管理漁港の防波堤・荷役岸壁等は原則立入禁止です。特に<strong>1B両津・1C姫埼・1D水津・1E赤泊・⑥沢根佐和田</strong>は周辺地形に基づく仮評価であり、実釣前に合法的な入釣可能箇所を現地標識で必ず確認してください。
+          <div class="text-slate-700 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+            <strong>【現地利用メモ】</strong><br>
+            港・護岸・岬の利用条件は地点や区間によって異なります。現地の案内・立入表示を確認し、開放区域を利用してください。足場点数は地形・構造の歩きやすさを示す評価です。
           </div>
         </div>
         <div class="flex flex-wrap gap-4 text-xs text-sky-900 pt-0.5 px-1">
@@ -213,13 +213,13 @@
   <section id="tableView" class="hidden bg-white border rounded-xl p-3 sm:p-5 shadow-sm">
     <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
       <h2 class="font-black text-lg">全15地点 スコア・移動条件比較表</h2>
-      <span class="text-xs text-slate-500">※行タップで詳細表示（4.2以上:快適 ／ 3.5〜4.1:良好 ／ 2.6〜3.4:標準 ／ 1.8〜2.5:やや難 ／ 1.7以下:注意）</span>
+      <span class="text-xs text-slate-500">※行タップで詳細。足場は歩行しやすさの相対評価（風・波は別項目）。</span>
     </div>
     <div class="overflow-x-auto">
       <table class="min-w-[1250px] w-full text-sm border-collapse">
         <thead class="bg-slate-100 border-y text-xs">
           <tr>
-            <th class="p-2.5 text-left">番号</th><th class="p-2.5 text-left">釣り場名</th><th class="p-2.5 text-left">入釣可否・確度</th><th class="p-2.5 text-left">車移動（概算）</th><th class="p-2.5 text-left">駐車後の徒歩目安</th><th class="p-2.5 text-left">北西風耐性</th><th class="p-2.5 text-left">カゴ釣り</th><th class="p-2.5 text-left">エギング</th><th class="p-2.5 text-left">足場(歩行)</th><th class="p-2.5 text-left">Googleマップ</th>
+            <th class="p-2.5 text-left">番号</th><th class="p-2.5 text-left">釣り場名</th><th class="p-2.5 text-left">利用メモ・評価確度</th><th class="p-2.5 text-left">車移動（概算）</th><th class="p-2.5 text-left">駐車後の徒歩目安</th><th class="p-2.5 text-left">北西風耐性</th><th class="p-2.5 text-left">カゴ釣り</th><th class="p-2.5 text-left">エギング</th><th class="p-2.5 text-left">足場(歩行)</th><th class="p-2.5 text-left">Googleマップ</th>
           </tr>
         </thead>
         <tbody id="tableBody"></tbody>
@@ -248,71 +248,75 @@ const spotsList = [
     waveExposure: '東うねり時のみ注意',
     accessStatus: 'verified', accessLabel: '入釣可（公園突堤・周辺磯）',
     scoreConfidence: '高（公式ガイド掲載）',
-    footingSplit: '風島なぎさ公園側の石積突堤：4.3（快適） ／ 赤亀岩周辺の自然岩礁：2.7（標準・窪み穴あり転倒注意）',
+    footingSplit: '公園突堤：4.3 ／ 赤亀岩周辺：2.7。エリア総合3.7は両方の特徴を踏まえた代表値で、単純平均ではありません。',
     targets: ['アオリイカ', 'クロダイ', 'メジナ', 'アジ', 'イナダ'],
     desc: '佐渡市片野尾にある公園一体型の釣り場。赤亀岩と風島弁天の間に石積堤が伸び、藻場と沈み根が発達した秋エギングの主力ポイントです。',
     kagoDesc: '水深がやや浅いため3.1評価ですが、潮通しの良い先端や沈み根周りでクロダイ・回遊魚が狙えます。',
-    egingDesc: '藻場と岩礁の際を広範囲に探れる好適場（4.2）。携帯電波が弱い箇所があるため複数人での行動を推奨します。'
+    egingDesc: '藻場と岩礁の際を広範囲に探れる好適場（4.2）。携帯電波が弱い箇所があるため複数人での行動を推奨します。',
+    footingDesc: '整備された突堤には歩きやすい部分があり、赤亀岩側は自然岩礁の段差や窪みに注意。エリア内で難易度が異なる。'
   },
   {
     code: '1B', sortOrder: 2, groupTag: '① 東・南岸グループ',
     title: '両津港周辺 ※釣り座要確認', type: 'pier', typeName: '港湾・護岸',
     distText: '約17km', timeMin: 30, timeText: '車 約25〜35分',
-    walkText: '未調査（許可岸壁・駐車可否を要現地確認）',
-    mapQuery: '新潟県佐渡市両津湊 両津港',
+    walkText: '釣り座と駐車場所により異なる（現地表示を確認）', mapQuery: '新潟県佐渡市両津湊 両津港',
     kagoFit: 3.1, egingFit: 3.2, footingLevel: 4.2, windFit: 3.5,
     isWindShelter: true, windNote: '○ 北西風に強い（吹き抜けの横風に注意）',
     waveExposure: '湾内で波は穏やか', accessStatus: 'unverified',
-    accessLabel: '※要現地確認（港湾規制あり）', scoreConfidence: '仮評価（具体的釣り座未確定）',
+    accessLabel: '現地の利用案内を確認', scoreConfidence: '中（岸壁等の構造に基づく目安）',
     targets: ['アジ', 'クロダイ', 'アオリイカ'],
-    desc: '国道350号で直行できる東岸拠点。フェリー発着場・荷役岸壁・防波堤の立入禁止区域が広いため、合法的に竿を出せる護岸の現地確認が必須です。',
-    kagoDesc: '立入可能な岸壁に限定されるため3.1の仮評価。サビキやウキ釣りでのアジ・クロダイ向きです。',
-    egingDesc: '港内の許可区域から海藻帯やブレイクを探る形となり、3.2の参考評価としています。'
+    desc: '佐渡の主要港。コンクリート岸壁や防波堤が多く、構造上の足場は平坦な区間が主体。港内の釣り座は利用案内を確認し、現地の状況に合う場所を選びたい。',
+    kagoDesc: '港内の水深や潮通しの良い岸壁を想定した参考評価。アジ・クロダイ狙いが候補。',
+    egingDesc: '港内の藻場やかけ上がりに隣接した釣り座を想定した参考評価。',
+    footingDesc: '平坦なコンクリート岸壁などを対象とした構造上の評価。港内でも段差や消波ブロック付近には注意。'
   },
   {
     code: '1C', sortOrder: 3, groupTag: '① 東・南岸グループ',
-    title: '姫埼灯台周辺（両津大川）※入磯路要確認', type: 'hiraiso', typeName: '岬・岩礁海岸',
+    title: '姫埼灯台周辺（両津大川）', type: 'hiraiso', typeName: '岬・岩礁海岸',
     distText: '約27km', timeMin: 45, timeText: '車 約40〜50分',
     walkText: '未調査（灯台Pから海岸への安全な入磯経路を要確認）',
     mapQuery: '新潟県佐渡市両津大川 姫埼灯台',
-    kagoFit: 3.0, egingFit: 3.7, footingLevel: 2.7, windFit: 3.7,
+    kagoFit: 3.0, egingFit: 3.7, footingLevel: 2.8, windFit: 3.7,
     isWindShelter: true, windNote: '○ 西風をかわしやすい',
     waveExposure: '北〜北東からの回り込み波に注意', accessStatus: 'unverified',
-    accessLabel: '※入磯経路・釣り座要確認', scoreConfidence: '仮評価（周辺地形からの推定）',
+    accessLabel: '釣り座・経路は現地確認', scoreConfidence: '仮評価（周辺地形からの推定）',
     targets: ['アオリイカ', 'クロダイ', 'メジナ'],
     desc: '両津湾南東端に張り出す岬周辺。観光エリアとしての灯台周辺から実際の釣り座への安全な入磯ルートについて現地確認が必要です。',
     kagoDesc: '遠投カゴの具体的な釣り座裏づけが乏しいため3.0の仮評価としています。',
-    egingDesc: '岩礁と藻場が点在するため3.7としていますが、足場（2.7）と入磯ルートの安全確認が前提です。'
+    egingDesc: '岩礁と藻場を探る候補（3.7）。足場は自然岩場主体（2.8）で、釣り座に応じて段差が異なる。',
+    footingDesc: '灯台周辺の自然岩礁を想定。平坦な整備面は少なく、段差や傾斜があるため立ち位置ごとの見極めが必要。'
   },
   {
     code: '1D', sortOrder: 4, groupTag: '① 東・南岸グループ',
-    title: '水津港周辺 ※釣り座要確認', type: 'pier', typeName: '東岸の港・周辺沿岸',
+    title: '水津港周辺', type: 'pier', typeName: '東岸の港・周辺沿岸',
     distText: '約29km', timeMin: 50, timeText: '車 約45〜55分',
     walkText: '未調査（港内岸壁の立入可能範囲を要現地確認）',
     mapQuery: '新潟県佐渡市水津 水津漁港',
     kagoFit: 3.3, egingFit: 3.7, footingLevel: 4.0, windFit: 4.0,
     isWindShelter: true, windNote: '○ 北西風の風裏',
     waveExposure: '東寄りの風波以外は穏やか', accessStatus: 'unverified',
-    accessLabel: '※要現地確認（防波堤原則禁止）', scoreConfidence: '仮評価（入釣可能範囲未確定）',
+    accessLabel: '現地の利用案内を確認', scoreConfidence: '中（岸壁等の構造に基づく目安）',
     targets: ['アジ', 'クロダイ', 'アオリイカ', 'メジナ'],
-    desc: '赤亀・風島のすぐ北側に位置する東岸の港。防波堤等の立入規制区域を避け、利用可能な港内岸壁や周辺沿岸がどこまでか現地確認が必要です。',
-    kagoDesc: '防波堤先端を使用しない条件での適性は3.3です。',
-    egingDesc: '港周辺の岩礁・藻場隣接エリアを想定し3.7の参考評価としています。'
+    desc: '赤亀・風島の北に位置する東岸の港。平坦なコンクリート岸壁や周辺の海岸を候補とし、北西風の影響を受けにくい場所を探せる。北側防波堤などの区画表示には留意。',
+    kagoDesc: '岸壁からアジ・クロダイなどを狙う場合の参考値（3.3）。',
+    egingDesc: '港周辺の岩礁・藻場隣接エリアを想定し3.7の参考評価としています。',
+    footingDesc: '港内の平坦なコンクリート岸壁等を想定。海際の段差や狭さに留意し、足元が安定した区間を選ぶ。'
   },
   {
     code: '1E', sortOrder: 5, groupTag: '① 東・南岸グループ',
-    title: '赤泊港周辺 ※釣り座要確認', type: 'pier', typeName: '小佐渡南岸の港・護岸',
+    title: '赤泊港周辺', type: 'pier', typeName: '小佐渡南岸の港・護岸',
     distText: '約27km', timeMin: 45, timeText: '車 約40〜50分',
     walkText: '未調査（立入可能な護岸・駐車位置を要現地確認）',
     mapQuery: '新潟県佐渡市赤泊 赤泊港',
-    kagoFit: 3.4, egingFit: 3.3, footingLevel: 4.2, windFit: 4.5,
+    kagoFit: 3.4, egingFit: 3.3, footingLevel: 4.3, windFit: 4.5,
     isWindShelter: true, windNote: '◎ 北〜北西風に極めて強い（小佐渡丘陵が遮蔽）',
     waveExposure: '南うねり時以外は極めて穏やか', accessStatus: 'unverified',
-    accessLabel: '※要現地確認（港湾規制あり）', scoreConfidence: '仮評価（具体的釣り座未確定）',
+    accessLabel: '現地の利用案内を確認', scoreConfidence: '中（岸壁等の構造に基づく目安）',
     targets: ['アジ', 'クロダイ', 'アオリイカ'],
-    desc: '小佐渡丘陵が北西季節風を遮るため、風裏としての遮蔽性（4.5）はトップクラス。ただし港湾施設の立入可能範囲を現地標識で確認する必要があります。',
+    desc: '小佐渡南岸の港湾エリア。北西風は背後の丘陵が遮りやすく、平坦なコンクリート構造物の多い沿岸として足場を評価。釣り座の利用条件は現地の案内を確認。',
     kagoDesc: '立入可能な岸壁からの釣りを想定した適性は3.4です。',
-    egingDesc: 'エギング適性は3.3の参考値。荒天時の岸壁アジ・クロダイ等の退避候補です。'
+    egingDesc: 'エギング適性は3.3の参考値。荒天時の岸壁アジ・クロダイ等の退避候補です。',
+    footingDesc: '長いコンクリート護岸・防波堤の平坦性に基づく評価。区間ごとの段差や海面との高低差に注意。'
   },
   {
     code: '1F', sortOrder: 6, groupTag: '① 東・南岸グループ',
@@ -320,14 +324,15 @@ const spotsList = [
     distText: '約28km', timeMin: 48, timeText: '車 約40〜55分',
     walkText: '駐車スペースから磯場歩き 徒歩約5〜10分（高低差あり）',
     mapQuery: '新潟県佐渡市羽茂三瀬 野崎鼻',
-    kagoFit: 4.3, egingFit: 3.9, footingLevel: 2.3, windFit: 4.4,
+    kagoFit: 4.3, egingFit: 3.9, footingLevel: 2.6, windFit: 4.4,
     isWindShelter: true, windNote: '◎ 北西風に強い（南からのうねり・波浪には注意）',
     waveExposure: '南うねり時は波を被るため不可', accessStatus: 'verified',
     accessLabel: '入釣可（本格地磯・装備必須）', scoreConfidence: '高（現地解説・実績多数）',
     targets: ['マダイ', '青物', 'メジナ', 'クロダイ', 'アオリイカ'],
     desc: '赤泊の西側、羽茂三瀬にある小佐渡南岸の代表的な地磯。沖約40mに海面からわずかに出る大根があり、その周囲の深場と潮通しによって大物が集まります。',
     kagoDesc: '約40m沖のシモリ周りを流れる本流筋を狙え、マダイ・青物のカゴ釣り適性は4.3と極めて優秀です。',
-    egingDesc: '豊富な海藻帯と水深のある岩礁で良型アオリイカが狙えます（3.9）。ただし高低差があり足場は2.3と険しいため磯靴・ライジャケ必須です。'
+    egingDesc: '海藻帯と水深のある岩礁でアオリイカが候補（3.9）。高低差はあるが比較的平らな岩棚もあり、足場2.6。磯装備を推奨。',
+    footingDesc: '高低差の大きい磯だが、場所によって比較的平らな岩棚もある。入磯経路と海際の傾斜には注意。'
   },
   {
     code: '2', sortOrder: 7, groupTag: null,
@@ -335,7 +340,7 @@ const spotsList = [
     distText: '約14km', timeMin: 25, timeText: '車 約20〜30分',
     walkText: '駐車場・キャンプ場付近から磯場徒歩約3〜8分',
     mapQuery: '新潟県佐渡市橘 長手岬',
-    kagoFit: 3.3, egingFit: 4.3, footingLevel: 3.1, windFit: 1.1,
+    kagoFit: 3.3, egingFit: 4.3, footingLevel: 3.4, windFit: 1.1,
     isWindShelter: false, windNote: '× 西〜北西風に極めて弱い（凪の日限定）',
     waveExposure: '海面が近く少しのうねりで波を被る',
     accessStatus: 'verified', accessLabel: '入釣可（公式ガイド掲載・キャンプ場下）',
@@ -343,7 +348,8 @@ const spotsList = [
     targets: ['アオリイカ', 'クロダイ', 'マダイ', 'メジナ', '根魚'],
     desc: '『佐渡フィッシングガイド』掲載。ぐるっと磯場を歩ける広大な波食棚で起伏のある海底に多くの魚をストックしていますが、波には非常に弱い地形です。',
     kagoDesc: '先端部の潮通しでマダイ・クロダイも狙えます（3.3）。',
-    egingDesc: 'エギング適性は4.3と最上位クラス。ただし海面との高低差が小さく波を被りやすいため、足場評価は3.1、北西風耐性は1.1としています。'
+    egingDesc: '藻場・岩礁に富むエギング有力地点（4.3）。広い岩棚には歩きやすい箇所もあり足場3.4。ただし波が上がる日は入らない。',
+    footingDesc: '広い岩棚と遊歩道があり立ち位置を選びやすい。凹凸・潮だまりがあり、海面に近い場所は波に注意。'
   },
   {
     code: '3', sortOrder: 8, groupTag: null,
@@ -355,11 +361,12 @@ const spotsList = [
     isWindShelter: false, windNote: '× 西うねり・強風に弱い（防波堤は立入禁止）',
     waveExposure: '西〜南西のうねりが直接入る',
     accessStatus: 'verified', accessLabel: '地磯側のみ可（防波堤は立入禁止）',
-    scoreConfidence: '高（公式ガイド掲載）',
+    scoreConfidence: '中（公式ガイド掲載・個別岩場未確認）',
     targets: ['アオリイカ', 'クロダイ', 'メジナ', 'マダイ', 'アジ'],
     desc: '『佐渡フィッシングガイド』掲載。漁港の防波堤は立入禁止のため、外側の自然岩礁・低磯が釣り座となります。潮通しが良く大物実績もある好ポイントです。',
     kagoDesc: '岩場からの遠投でマダイ・クロダイ・アジが狙えます（3.7）。',
-    egingDesc: 'シモリと藻場が絡む好条件（4.2）。自然の岩場で海面に近いため、足場は3.0、風耐性は1.6です。'
+    egingDesc: 'シモリと藻場が絡む好条件（4.2）。自然の岩場で海面に近いため、足場は3.0、風耐性は1.6です。',
+    footingDesc: '岩場を主体とする暫定評価。平坦な足場の範囲や入磯路は地点ごとに確認したい。'
   },
   {
     code: '4', sortOrder: 9, groupTag: null,
@@ -375,7 +382,8 @@ const spotsList = [
     targets: ['シロギス', 'クロダイ', 'アオリイカ', 'メジナ', 'メバル'],
     desc: '『佐渡フィッシングガイド』掲載。相川中心街から南に続く海岸で、砂地と黒い岩礁帯が混在する「投げ釣りの好ポイント」です。',
     kagoDesc: '遠浅地形のため深場狙いのカゴ釣りには不向き（2.0）。クロダイの渚釣りやシロギス投げ釣りが主役です。',
-    egingDesc: '黒い岩礁帯・海藻帯を選んで狙う釣り場で、エギング適性は3.2です。'
+    egingDesc: '黒い岩礁帯・海藻帯を選んで狙う釣り場で、エギング適性は3.2です。',
+    footingDesc: '砂浜と浅い岩礁が混じり、比較的移動しやすい。岩礁部分の凹凸と砂の沈み込みに注意。'
   },
   {
     code: '5', sortOrder: 10, groupTag: null,
@@ -393,57 +401,62 @@ const spotsList = [
     targets: ['アジ', 'クロダイ', 'メジナ', 'マダイ', 'アオリイカ', 'イナダ'],
     desc: '橋を渡った先の西防波堤の一部が柵で囲われ、釣り空間として公式開放されています。トイレ・駐車場も整備され足場は4.6と極めて良好ですが、期間・時間・まき餌ルール・荒天閉鎖の厳守が必要です。',
     kagoDesc: '潮通し・水深ともカゴ釣りに好適（3.8）ですが、「オキアミ以外のまき餌は禁止」のルールを厳守してください。',
-    egingDesc: '港外周や防波堤周りの岩礁帯でアオリイカも狙えます（3.7）。ただし10:00〜16:00の日中限定となります。'
+    egingDesc: '港外周や防波堤周りの岩礁帯でアオリイカも狙えます（3.7）。ただし10:00〜16:00の日中限定となります。',
+    footingDesc: '指定開放区域の整備された歩行面が主体。比較的平坦で荷物を置きやすい。'
   },
   {
     code: '6', sortOrder: 11, groupTag: null,
-    title: '沢根・佐和田周辺（窪田海岸等）※混在', type: 'pier', typeName: '真野湾内の海岸・護岸',
-    distText: '約2〜7km', timeMin: 10, timeText: '車 約5〜15分',
-    walkText: '窪田海岸等は駐車後徒歩1〜3分／港湾部は立入可否要確認',
-    mapQuery: '新潟県佐渡市窪田 窪田海岸',
-    kagoFit: 2.8, egingFit: 3.2, footingLevel: 3.8, windFit: 2.2,
-    isWindShelter: false, windNote: '△ 沢根北岸は北風軽減／佐和田・窪田は西風正面',
-    waveExposure: '湾内だが西〜北西強風時は波立つ',
-    accessStatus: 'unverified', accessLabel: '※海岸は可／港湾施設は要確認',
-    scoreConfidence: '中（複数地形の混合評価）',
-    targets: ['シロギス', 'ヒラメ', 'マゴチ', 'スズキ', 'クロダイ', 'アジ', 'アオリイカ'],
-    desc: '拠点ヴィンセント最寄りの真野湾エリア。『佐渡フィッシングガイド』掲載の窪田海岸（砂地・投げ釣りやヒラメ・マゴチ・スズキのルアー好場）と沢根側の沿岸を含みます。',
-    kagoDesc: '遠浅の砂地が多く、カゴ釣り適性は2.8です。沢根側の水深がある箇所が中心になります。',
-    egingDesc: '3.2評価。港施設と自然海岸が混在するため足場は3.8、風耐性は2.2としています。'
+    title: '沢根・佐和田周辺（護岸・岸壁）', type: 'pier', typeName: '真野湾内の護岸・岸壁',
+    distText: '約5〜8km', timeMin: 15, timeText: '車 約10〜20分（概算）',
+    walkText: '選ぶ護岸・岸壁により異なる（海際の立ち位置を確認）',
+    mapQuery: '新潟県佐渡市沢根五十里 沢根漁港',
+    kagoFit: 3.1, egingFit: 3.4, footingLevel: 4.0, windFit: 3.0,
+    isWindShelter: false, windNote: '△ 北西寄りは場所によって軽減／西〜南西風には注意',
+    waveExposure: '湾内でも西寄りの風で波が立つことがある',
+    accessStatus: 'unverified', accessLabel: '現地の利用案内を確認',
+    scoreConfidence: '中（護岸形状に基づく暫定値）',
+    targets: ['アジ', 'クロダイ', 'アオリイカ', 'メバル'],
+    desc: '沢根漁港周辺の平坦なコンクリート岸壁・防波堤の形状を中心に評価。佐和田側の海岸護岸は区間によって傾斜や段差が異なり、同じ足場条件ではない。護岸側で釣る候補として、砂浜とは独立して評価した。',
+    kagoDesc: '港湾沿岸でのアジ・クロダイ狙いを想定。湾奥側は浅い場所もあるためカゴ適性3.1（暫定）。',
+    egingDesc: '岩礁・藻場の隣接区間を選べればエギングの候補（3.4）。具体的な藻場や釣果は地点により異なる。',
+    footingDesc: '平坦なコンクリート海際を代表値とした4.0。縁の高さ・狭さ・傾斜や消波ブロックの有無は区間ごとに異なる。',
+    accessNote: '利用条件は現地表示を確認。'
   },
   {
     code: '7', sortOrder: 12, groupTag: null,
-    title: '真野湾・国府川河口付近（ルアー・投げ特化）', type: 'pier', typeName: '河口域・左右サーフ（テトラ立入禁止）',
-    distText: '約4.5km', timeMin: 12, timeText: '車 約8〜15分',
-    walkText: '河口周辺の駐車余地からサーフへ徒歩約2〜5分',
-    mapQuery: '新潟県佐渡市四日町 国府川河口',
-    kagoFit: 1.0, egingFit: 1.0, footingLevel: 3.8, windFit: 1.3,
-    isWindShelter: false, windNote: '× 西〜北西風が正面から吹き込む',
-    waveExposure: '西風時に波が立ちやすい（サラシ形成）',
-    accessStatus: 'verified', accessLabel: '入釣可（公式ガイド掲載・※テトラ立入禁止）',
-    scoreConfidence: '高（公式ガイド掲載）',
-    ruleAlert: '【特記】カゴ・エギングは1.0（注意）。シーバス・ヒラメ・マゴチのルアー釣り及びシロギス投げ釣り特化（適性4.3相当）。※テトラポッドは立入禁止。',
-    targets: ['スズキ(シーバス)', 'ヒラメ', 'マゴチ', 'クロダイ', 'シロギス', 'ハゼ'],
-    desc: '『佐渡フィッシングガイド』掲載。佐渡随一の河川の河口域で、川の中や左右の海岸が釣り場です。公式ガイドで「テトラポッドには立ち入らないように」と明記されています。',
-    kagoDesc: '汽水・浅場サーフのためカゴ釣りは1.0（注意）です。',
-    egingDesc: 'エギングも1.0（注意）。晩秋の落ち鮎・ベイトが絡むシーバスやフラットフィッシュ狙いに特化したポイントです。'
+    title: '窪田海岸（サーフ）', type: 'surf', typeName: '真野湾内の砂浜・サーフ',
+    distText: '約2〜5km', timeMin: 10, timeText: '車 約5〜15分（概算）',
+    walkText: '海岸沿いの駐車位置から砂浜へ徒歩約1〜5分（概算）',
+    mapQuery: '新潟県佐渡市窪田 窪田海岸',
+    kagoFit: 1.4, egingFit: 1.8, footingLevel: 3.6, windFit: 2.0,
+    isWindShelter: false, windNote: '△ 湾内だが開けた砂浜で西〜北西風の影響あり',
+    waveExposure: '西寄りの風やうねりで波が立つ',
+    accessStatus: 'verified', accessLabel: '海岸の釣り場（県ガイド掲載）',
+    scoreConfidence: '高（砂地の地形確認／釣法・風は目安）',
+    targets: ['シロギス', 'ヒラメ', 'マゴチ', 'スズキ', 'ハゼ'],
+    desc: '真野湾沿いの砂地主体のサーフ。県の釣り場ガイドで投げ釣り・ルアー釣り場として紹介され、シロギスやヒラメ、マゴチなどが候補。カゴ釣り・エギングの適性は低いが、サーフルアーの価値は高い。',
+    kagoDesc: '遠浅の砂底を主体とするため、深い釣り座や潮通しを活かすカゴ釣りは優先度低め（1.4）。',
+    egingDesc: '砂地が主体で、連続する岩礁・藻場を狙う典型的なエギング場とは異なる（1.8）。',
+    footingDesc: '砂浜は横移動しやすいが、乾いた砂の沈み込みで歩行やキャスト時の安定性が下がる（3.6）。',
+    accessNote: '砂浜と護岸は独立した評価。'
   },
   {
     code: '8', sortOrder: 13, groupTag: null,
-    title: '平根崎（戸中・波蝕甌穴群）', type: 'heavy', typeName: '外海府の巨大岩盤斜面・上級者地磯',
+    title: '平根崎（戸中・波蝕甌穴群）', type: 'heavy', typeName: '外海府の広大な岩棚・地磯',
     distText: '約23km', timeMin: 40, timeText: '車 約35〜45分',
-    walkText: '上の駐車スペースから階段・急斜面岩盤を徒歩約5〜10分（要注意）',
+    walkText: '駐車場付近から岩盤へ降りる経路あり／釣り座ごとの歩行距離・傾斜は未確認',
     mapQuery: '新潟県佐渡市戸中 平根崎の波蝕甌穴群',
-    kagoFit: 4.5, egingFit: 3.3, footingLevel: 1.3, windFit: 0.5,
+    kagoFit: 4.5, egingFit: 3.3, footingLevel: 2.4, windFit: 0.5,
     isWindShelter: false, windNote: '× 北西風・うねりに最弱（0.5・完全凪限定）',
-    waveExposure: '斜面を波が駆け上がり極めて危険',
-    accessStatus: 'verified', accessLabel: '入釣可（上級者限定・完全凪のみ）',
-    scoreConfidence: '高（公式ガイド・天然記念物データ）',
-    ruleAlert: '【厳重警戒】岩盤斜面500mに直径2m以上・深さ最大3mに達する巨大な甌穴（ポットホール）が多数開口。滑りやすく波の駆け上がりも激しいため足場評価は1.3（注意）。',
+    waveExposure: '外海のうねりが斜面や低い岩棚に駆け上がるため、凪でも波浪確認が必須',
+    accessStatus: 'verified', accessLabel: '岩場への立入り可能（釣り座・安全性は個別確認）',
+    scoreConfidence: '中（地形・釣行記事に基づく目安／個々の釣り座未確認）',
+    ruleAlert: '【足場は場所によって大きく異なる】約500mに及ぶ岩棚には立ち位置を選べる余地がありますが、傾斜・滑りやすい岩面・深い甌穴が混在します。足場2.4は釣り場全体の暫定目安であり、安全な個別釣り座を保証する数値ではありません。北西風やうねりがある日は立ち入らないでください。',
     targets: ['ヒラマサ', 'マダイ', 'イナダ', 'イシダイ', 'メジナ', 'クロダイ', 'アオリイカ'],
-    desc: '『佐渡フィッシングガイド』にて「ヒラマサ、マダイなど夢の大物も狙える」と紹介される外海府屈指の地磯。ただし巨大な甌穴群と傾斜した岩盤のため、安全性は全15地点で最も厳しい上級者向けフィールドです。',
+    desc: '『佐渡フィッシングガイド』掲載の大物狙いで知られる広大な地磯。横に長い岩棚を移動しながら釣り座を探せますが、比較的歩きやすい部分と急傾斜・甌穴の多い部分が混在します。平坦で安全な具体的釣り座は未特定のため、現地で足元・退避経路・波の到達範囲を確認してください。',
     kagoDesc: '先端部の潮通しと水深は抜群で、マダイ・ヒラマサ狙いのカゴ釣りポテンシャルは4.5と最高峰です。',
-    egingDesc: 'アオリイカ・ヤリイカも回遊しますが、足場に注意が必要で、エギング適性は3.3です。'
+    egingDesc: 'アオリイカ・ヤリイカも回遊しますが、足場に注意が必要で、エギング適性は3.3です。',
+    footingDesc: '広い岩棚に立ち位置を選べる箇所がある一方、傾斜・甌穴・滑りやすい岩面が混在する。'
   },
   {
     code: '9', sortOrder: 14, groupTag: null,
@@ -451,23 +464,24 @@ const spotsList = [
     distText: '約13km', timeMin: 23, timeText: '車 約20〜28分',
     walkText: '駐車場から遊歩道・階段を下り徒歩約3〜5分',
     mapQuery: '新潟県佐渡市下相川 千畳敷',
-    kagoFit: 2.0, egingFit: 3.2, footingLevel: 2.9, windFit: 0.9,
+    kagoFit: 2.0, egingFit: 3.2, footingLevel: 3.3, windFit: 0.9,
     isWindShelter: false, windNote: '× 西〜北西の風・うねりに非常に弱い（0.9）',
     waveExposure: '水面が近く波を被りやすい',
     accessStatus: 'verified', accessLabel: '岩棚のみ（海上の橋・堤防等は除外）',
     scoreConfidence: '高（観光・地形資料照合）',
     targets: ['アオリイカ', 'クロダイ', 'メジナ'],
-    desc: '下相川の景勝地に広がる平坦な岩礁。歩く面は平らに見えますが海面との高低差が小さく、少しでもうねりがあると波を被りやすく、足場は2.9、風耐性は0.9です。',
+    desc: '下相川の景勝地に広がる平坦な波食棚。比較的歩きやすい部分を選べるが、海面に近い岩棚はうねりで波をかぶるため、足元と退避経路を確認して利用する。',
     kagoDesc: '沖まで浅い岩棚が続くため遠投カゴ釣りには不向き（2.0）です。',
-    egingDesc: '完全に凪いだ日に限り、浅場の藻場・スリット周りをエギングで探れます（3.2）。'
+    egingDesc: '完全に凪いだ日に限り、浅場の藻場・スリット周りをエギングで探れます（3.2）。',
+    footingDesc: '平らな岩棚が広がり、立ち位置を選べるが、海面に近い部分ではうねりの影響を受けやすい。'
   },
   {
     code: '10', sortOrder: 15, groupTag: null,
     title: '強清水（小木半島南岸・宿根木先）', type: 'heavy', typeName: '小木半島南岸の本格地磯',
     distText: '約34km', timeMin: 52, timeText: '車 約45〜60分',
-    walkText: '道路脇の駐車余地から岩場へ徒歩約5〜10分（複雑な磯場）',
+    walkText: '道路脇から岩場へ徒歩約5〜10分（岩棚と段差が混在）',
     mapQuery: '新潟県佐渡市強清水',
-    kagoFit: 4.3, egingFit: 4.0, footingLevel: 2.8, windFit: 4.0,
+    kagoFit: 4.3, egingFit: 4.0, footingLevel: 3.5, windFit: 4.0,
     isWindShelter: true, windNote: '○ 北風に強い（西〜南西の回り込みうねり注意）',
     waveExposure: '南西うねり時は注意',
     accessStatus: 'verified', accessLabel: '入釣可（公式ガイド掲載・地磯）',
@@ -475,7 +489,8 @@ const spotsList = [
     targets: ['マダイ', 'イシダイ', 'メジナ', 'ワラサ(青物)', 'クロダイ', 'アオリイカ'],
     desc: '『佐渡フィッシングガイド』掲載。小木半島の南岸にあり、沖へ張り出した部分は水深が深く、マダイ・イシダイ・メジナ・ワラサなどの大物を狙える一級地磯です。',
     kagoDesc: '公式ガイドでも大物実績が明記されており、水深と潮通しが良く、カゴ釣り適性は4.3です。',
-    egingDesc: 'アオリイカの魚影も濃く4.0評価。複雑な岩場のため足場は2.8です。'
+    egingDesc: 'アオリイカの候補地（4.0）。比較的歩きやすい岩棚を選べるものの、出っ張り部や海際は段差があるため足場は3.5。',
+    footingDesc: '清水荘下周辺には比較的歩きやすい岩棚がある。張り出し部や海際は凹凸・段差が増える。'
   }
 ];
 
@@ -492,11 +507,11 @@ const mapCoords = {
   '4':  { x: 278, y: 328, mx: 286, my: 336, label: '相川下戸', lx: 8, ly: 328 },
   '2':  { x: 239, y: 392, mx: 282, my: 392, label: '長手岬', lx: 8, ly: 409 },
   '3':  { x: 280, y: 426, mx: 288, my: 460, label: '稲鯨', lx: 8, ly: 490 },
-  '6':  { x: 360, y: 412, mx: 360, my: 448, label: '沢根・佐和田', lx: 8, ly: 571 },
-  '7':  { x: 407, y: 462, mx: 440, my: 485, label: '国府川河口', lx: 8, ly: 652 },
+  '6':  { x: 353, y: 412, mx: 345, my: 445, label: '沢根・護岸', lx: 8, ly: 571 },
+  '7':  { x: 389, y: 454, mx: 421, my: 486, label: '窪田海岸', lx: 8, ly: 652 },
   '10': { x: 345, y: 735, mx: 345, my: 772, label: '強清水', lx: 8, ly: 755 }
 };
-const colors = { pier: '#0284c7', hiraiso: '#059669', heavy: '#d97706' };
+const colors = { pier: '#0284c7', hiraiso: '#059669', heavy: '#d97706', surf: '#7c3aed' };
 let currentFilter = 'all', currentSort = 'code', excludeUnverified = false, selectedCode = '1A', currentZoom = 'fit';
 const $ = id => document.getElementById(id);
 
@@ -533,7 +548,7 @@ function accessBadge(spot) {
     return `<span class="inline-block text-[11px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300">${esc(spot.accessLabel)}</span>`;
   }
   if (spot.accessStatus === 'unverified') {
-    return `<span class="inline-block text-[11px] font-bold px-2 py-0.5 rounded bg-rose-100 text-rose-900 border border-rose-300">${esc(spot.accessLabel)}</span>`;
+    return `<span class="inline-block text-[11px] font-medium px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">${esc(spot.accessLabel)}</span>`;
   }
   return `<span class="inline-block text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-900 border border-emerald-300">${esc(spot.accessLabel)}</span>`;
 }
@@ -565,6 +580,7 @@ function sortComparator(a, b) {
   return (sorters[currentSort]?.() || 0) || a.sortOrder - b.sortOrder;
 }
 
+/* 全体表示と標準表示のみを提供 */
 function applyZoomWidth() {
   const wrapper = $('zoomWrapper');
   const viewport = $('mapViewport');
@@ -578,20 +594,16 @@ function applyZoomWidth() {
   }
 
   viewport.classList.add('zoom-scroll');
-  const zoom = Number(currentZoom);
-  if (isMobile) {
-    wrapper.style.width = Math.round(standardWidth * zoom) + 'px';
-  } else {
-    wrapper.style.width = (standardWidth * zoom) + '%';
-  }
+  wrapper.style.width = isMobile ? standardWidth + 'px' : standardWidth + '%';
 }
 
+// ズーム操作では選択中の釣り場に関係なくヴィンセントを中央へ寄せる
 function scrollMapToBase(smooth = true) {
   const viewport = $('mapViewport');
   const svg = $('sadoMapSvg');
   if (!viewport || !svg || currentZoom === 'fit') return;
 
-  const base = { x: 410, y: 432 };
+  const base = { x: 410, y: 432 }; // SVG上のヴィンセント拠点位置
   const targetLeft = (base.x / 1140) * svg.clientWidth - viewport.clientWidth / 2;
   const targetTop = (base.y / 920) * svg.clientHeight - viewport.clientHeight / 2;
   viewport.scrollTo({
@@ -741,8 +753,8 @@ function openSheet(code) {
       <button onclick="closeSheet()" class="border rounded-lg px-3 py-1.5 text-lg font-bold hover:bg-slate-100" aria-label="閉じる">×</button>
     </div>
     ${currentlyExcluded ? `
-      <div class="mt-3 p-3 rounded-lg bg-rose-50 border border-rose-300 text-rose-950 text-xs sm:text-sm font-bold leading-relaxed">
-        【除外中】この地点は釣り座未確認のため、現在「釣り座未確定の港・岬(※)を除外」設定により一覧から除外中です。
+      <div class="mt-3 p-2 rounded-lg bg-slate-50 border border-slate-200 text-slate-600 text-xs leading-relaxed">
+        ※この地点は「現地確認メモ付きの地点を除外」の対象です。
       </div>` : ''}
     <div class="mt-3 rounded-lg bg-sky-50 border border-sky-100 p-3 space-y-1.5 text-xs sm:text-sm">
       <div class="flex flex-wrap justify-between items-center gap-2">
@@ -768,6 +780,7 @@ function openSheet(code) {
         <strong>【エリア内の足場差】</strong> ${esc(d.footingSplit)}
       </div>` : ''}
     <p class="my-3 text-sm sm:text-base leading-relaxed">${esc(d.desc)}</p>
+      ${d.footingDesc ? `<div class="text-xs sm:text-sm text-slate-700 bg-emerald-50/70 rounded-lg border border-emerald-100 p-2.5"><strong>🥾 足場の評価理由：</strong>${esc(d.footingDesc)}</div>` : ''}
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm">
       <div class="p-2.5 rounded-xl bg-slate-50 border space-y-1">
         <span class="text-xs font-bold text-slate-500">北西風耐性</span>
@@ -833,6 +846,7 @@ function render() {
         <div><span class="text-[11px] text-slate-500">足場(歩行)</span><div class="mt-0.5">${scoreBadge(s.footingLevel)}</div></div>
       </div>
       <p class="text-xs text-slate-700 leading-relaxed my-2">${esc(s.desc)}</p>
+      ${s.footingDesc ? `<p class="text-xs text-emerald-900 bg-emerald-50/60 border border-emerald-100 rounded p-2 my-1"><strong>🥾 足場：</strong>${esc(s.footingDesc)}</p>` : ''}
       <div class="flex flex-wrap items-center justify-between gap-2 mt-2.5 pt-2 border-t border-slate-100">
         <div class="flex flex-wrap gap-1">
           ${s.targets.map(t => `<span class="text-[11px] bg-slate-100 border rounded px-2 py-0.5 font-medium">${esc(t)}</span>`).join('')}
@@ -914,7 +928,7 @@ $('export').addEventListener('click', () => {
   const blob = new Blob([new XMLSerializer().serializeToString(svg)], { type: 'image/svg+xml;charset=utf-8' });
   const url = URL.createObjectURL(blob), a = document.createElement('a');
   a.href = url;
-  a.download = 'sado_fishing_map_verified_15spots.svg';
+  a.download = 'sado_fishing_map_final_15spots.svg';
   document.body.appendChild(a);
   a.click();
   a.remove();
